@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e0a">
+<title>ОПЕРАЦИЯ «МАКСИМ» // v6.0 ANIME EDITION</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --green: #00ff88; --green-dim: #00cc6a; --orange: #ff8c1a;
+    --red: #ff3355; --purple: #b026ff; --cyan: #00e5ff; --gold: #ffd700;
+    --bg-0: #050705; --bg-1: #0a0e0a;
+    --panel: rgba(16, 23, 16, 0.7);
+    --border: rgba(0, 255, 136, 0.15);
+    --border-hi: rgba(0, 255, 136, 0.5);
+    --font-display: 'Orbitron', 'Courier New', monospace;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+    --font-body: 'Rajdhani', 'Segoe UI', sans-serif;
+    --r-sm: 6px; --r-md: 12px; --r-lg: 20px;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body); background: var(--bg-0); color: #c8d6c8;
+    min-height: 100vh; min-height: 100dvh; overflow-x: hidden;
+    position: relative; -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.02em;
+  }
+  body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-1); }
+  ::-webkit-scrollbar-thumb { background: rgba(0, 255, 136, 0.25); border-radius: 4px; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 800px 600px at 15% -10%, rgba(0, 255, 136, 0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 100%, rgba(255, 140, 26, 0.08), transparent 60%),
+      radial-gradient(ellipse 500px 400px at 50% 50%, rgba(176, 38, 255, 0.04), transparent 70%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1));
+    z-index: -2;
+  }
+  body::after {
+    content: ''; position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 255, 136, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 136, 0.025) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: -1;
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 90%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 90%);
+  }
+  #crt-overlay {
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0, 255, 136, 0.02) 0px, rgba(0, 255, 136, 0.02) 1px, transparent 1px, transparent 3px);
+    pointer-events: none; z-index: 9998; mix-blend-mode: overlay;
+  }
+  #matrix-canvas { position: fixed; inset: 0; z-index: -3; pointer-events: none; opacity: 0.28; }
+  #fx-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9990; }
+  #flash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 9995; transition: opacity 0.08s; }
+  #flash.fire { opacity: 0.75; }
+
+  button, .btn {
+    font-family: var(--font-display); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.12em;
+    background: linear-gradient(180deg, rgba(0, 255, 136, 0.08), rgba(0, 255, 136, 0.02));
+    color: var(--green); border: 1px solid var(--border-hi);
+    border-radius: var(--r-sm); padding: 14px 24px; cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: all 0.25s var(--ease-out); text-transform: uppercase;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; text-decoration: none; min-height: 48px;
+    -webkit-user-select: none; user-select: none;
+  }
+  button:hover:not(:disabled), .btn:hover {
+    color: #000; background: linear-gradient(180deg, var(--green), var(--green-dim));
+    border-color: var(--green);
+    box-shadow: 0 0 24px rgba(0, 255, 136, 0.5);
+  }
+  button:active:not(:disabled), .btn:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .ripple { position: absolute; border-radius: 50%; transform: scale(0); animation: ripple 0.6s linear; background: rgba(0, 255, 136, 0.4); pointer-events: none; }
+  @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+  /* ===== БУТ ===== */
+  #boot {
+    position: fixed; inset: 0; background: #000; z-index: 10000;
+    display: flex; align-items: center; justify-content: center;
+    padding: max(24px, var(--safe-top)) max(24px, var(--safe-right)) max(24px, var(--safe-bottom)) max(24px, var(--safe-left));
+    font-family: var(--font-mono);
+    transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+    overflow: hidden;
+  }
+  #boot.hide { opacity: 0; transform: scale(1.05); pointer-events: none; }
+  .boot-inner { max-width: 900px; width: 100%; display: grid; grid-template-columns: 1fr; gap: 32px; }
+  .boot-logo {
+    font-family: var(--font-display); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.6em; color: var(--green); text-align: center;
+    margin-bottom: 8px; text-shadow: 0 0 20px var(--green);
+    animation: bootBlink 1.4s infinite;
+  }
+  @keyframes bootBlink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: 0.4; } }
+  .boot-ascii {
+    font-family: var(--font-mono); font-size: 10px; line-height: 1.1;
+    color: var(--green); text-shadow: 0 0 10px rgba(0, 255, 136, 0.7);
+    white-space: pre; text-align: center; opacity: 0.75; display: none;
+  }
+  #boot-text {
+    font-family: var(--font-mono); font-size: 13px; line-height: 1.9;
+    color: var(--green); white-space: pre-wrap; min-height: 200px;
+    text-shadow: 0 0 6px rgba(0, 255, 136, 0.5); padding: 4px;
+  }
+  #boot-text .ok { color: var(--orange); font-weight: 700; }
+  #boot-text .warn { color: var(--cyan); }
+  .boot-terminal {
+    background: rgba(0, 255, 136, 0.02);
+    border: 1px solid rgba(0, 255, 136, 0.15);
+    border-radius: var(--r-md); padding: 20px;
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.1), inset 0 0 60px rgba(0, 255, 136, 0.03);
+    position: relative;
+  }
+  .boot-terminal::before {
+    content: ''; position: absolute; top: 10px; left: 12px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ff5f56; box-shadow: 14px 0 0 #ffbd2e, 28px 0 0 #27c93f;
+  }
+  .boot-terminal-inner { padding-top: 14px; }
+  #boot-cmd { margin-top: 16px; display: none; border-top: 1px dashed rgba(0, 255, 136, 0.15); padding-top: 14px; }
+  #boot-cmd.show { display: block; }
+  #boot-input {
+    width: 100%; background: transparent; border: none;
+    color: var(--green); font-family: var(--font-mono); font-size: 14px;
+    outline: none; padding: 6px 0; caret-color: var(--orange);
+  }
+  #boot-input::placeholder { color: rgba(0, 255, 136, 0.25); }
+  #boot-out { margin-top: 10px; font-family: var(--font-mono); font-size: 12px; color: var(--orange); min-height: 16px; }
+  #boot-prompt {
+    margin-top: 24px; text-align: center;
+    font-family: var(--font-display); font-size: 14px; font-weight: 700;
+    letter-spacing: 0.4em; color: var(--orange); opacity: 0;
+    transition: opacity 0.6s; text-shadow: 0 0 20px var(--orange);
+  }
+  #boot-prompt.show { opacity: 1; animation: promptPulse 1.6s ease-in-out infinite; }
+  @keyframes promptPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  .blink-cur { display: inline-block; animation: blinkCur 0.7s steps(2, start) infinite; }
+  @keyframes blinkCur { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+  /* ===== APP ===== */
+  #app {
+    display: none; min-height: 100vh; min-height: 100dvh;
+    padding: calc(16px + var(--safe-top)) calc(16px + var(--safe-right)) calc(16px + var(--safe-bottom)) calc(16px + var(--safe-left));
+    opacity: 0; transition: opacity 0.6s;
+  }
+  #app.show { display: block; opacity: 1; }
+  .app-grid { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .app-header {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 14px 20px; background: var(--panel);
+    backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid var(--border); border-radius: var(--r-md);
+    position: relative; overflow: hidden;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .brand-mark {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    display: grid; place-items: center;
+    font-family: var(--font-display); font-weight: 900;
+    font-size: 20px; color: #000;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    flex-shrink: 0; position: relative;
+  }
+  .brand-text { min-width: 0; }
+  .brand-title {
+    font-family: var(--font-display); font-size: 15px; font-weight: 900;
+    letter-spacing: 0.15em;
+    background: linear-gradient(90deg, var(--green), var(--cyan));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .brand-sub {
+    font-size: 10px; letter-spacing: 0.2em; color: rgba(0, 255, 136, 0.5);
+    font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    width: 44px; height: 44px; padding: 0; min-height: 44px;
+    border-radius: var(--r-sm); display: grid; place-items: center;
+    font-size: 18px; background: transparent;
+    color: rgba(0, 255, 136, 0.6); border: 1px solid var(--border);
+  }
+  .icon-btn:hover:not(:disabled) { color: #000; background: var(--green); box-shadow: 0 0 20px rgba(0, 255, 136, 0.6); }
+  .icon-btn.playing { color: var(--orange); border-color: var(--orange); box-shadow: 0 0 16px rgba(255, 140, 26, 0.5); animation: iconPulse 1.2s infinite; }
+  @keyframes iconPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+  .icon-btn.secret-btn { color: rgba(0, 255, 136, 0.25); border-color: rgba(0, 255, 136, 0.08); font-size: 14px; }
+  .icon-btn.secret-btn:hover:not(:disabled) { background: var(--orange); color: #000; box-shadow: 0 0 16px rgba(255, 140, 26, 0.4); }
+
+  .main-panel {
+    background: var(--panel);
+    backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid var(--border); border-radius: var(--r-lg);
+    padding: 28px; position: relative; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 136, 0.03);
+  }
+  .main-panel::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent); opacity: 0.6;
+  }
+  .main-panel.shaking { animation: shakeContainer 0.4s; }
+  @keyframes shakeContainer {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-8px, 4px); }
+    40% { transform: translate(8px, -4px); }
+    60% { transform: translate(-6px, -2px); }
+    80% { transform: translate(6px, 2px); }
+  }
+
+  .xp-bar { position: relative; height: 26px; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--border); border-radius: 13px; margin-bottom: 20px; overflow: hidden; }
+  .xp-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--green), var(--cyan), var(--purple), var(--orange));
+    background-size: 300% 100%; transition: width 0.9s var(--ease-spring);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); position: relative;
+    animation: xpFlow 3s linear infinite;
+  }
+  @keyframes xpFlow { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+  .xp-label {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 11px;
+    letter-spacing: 0.15em; color: #fff; z-index: 2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  }
+  .steps { display: flex; gap: 6px; justify-content: center; margin-bottom: 24px; }
+  .step { flex: 1; max-width: 50px; height: 4px; background: rgba(0, 255, 136, 0.08); border-radius: 2px; position: relative; overflow: hidden; transition: all 0.4s; }
+  .step::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--green), var(--cyan)); transform: translateX(-100%); transition: transform 0.5s var(--ease-out); }
+  .step.active::before { transform: translateX(0); }
+  .step.done::before { transform: translateX(0); background: linear-gradient(90deg, var(--orange), var(--gold)); }
+  .step.active { box-shadow: 0 0 20px rgba(0, 255, 136, 0.6); }
+
+  .screen { display: none; animation: screenIn 0.5s var(--ease-out); }
+  .screen.active { display: block; }
+  @keyframes screenIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .screen-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--orange); padding: 4px 10px;
+    border: 1px solid rgba(255, 140, 26, 0.3); border-radius: 100px;
+    background: rgba(255, 140, 26, 0.05); margin-bottom: 16px;
+  }
+  .screen-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 8px var(--orange); animation: tagBlink 1.2s infinite; }
+  @keyframes tagBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  h1.screen-title {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 3.5vw, 28px); font-weight: 900;
+    letter-spacing: 0.05em; line-height: 1.15; margin-bottom: 16px;
+    background: linear-gradient(120deg, var(--green), #fff 50%, var(--green));
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: titleFlow 6s ease-in-out infinite;
+  }
+  @keyframes titleFlow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  .screen-desc { font-size: 16px; line-height: 1.7; color: #a8b8a8; margin-bottom: 24px; font-weight: 500; }
+  .hl-green { color: var(--green); font-weight: 700; text-shadow: 0 0 12px rgba(0, 255, 136, 0.5); }
+  .hl-orange { color: var(--orange); font-weight: 700; text-shadow: 0 0 12px rgba(255, 140, 26, 0.5); }
+  .hl-red { color: var(--red); font-weight: 700; text-shadow: 0 0 12px rgba(255, 51, 85, 0.5); }
+
+  /* ЗАДАНИЕ 1: БЕГАЮЩИЙ МЕЧ */
+  .hp-zone {
+    position: relative;
+    min-height: 320px;
+    background:
+      radial-gradient(ellipse at center, rgba(255, 140, 26, 0.08), transparent 65%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    margin: 16px 0 12px;
+    padding: 0;
+  }
+  .hp-zone::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    pointer-events: none;
+  }
+  .hp {
+    position: absolute;
+    top: 50%; left: 50%;
+    font-size: 56px;
+    cursor: pointer;
+    user-select: none;
+    line-height: 1;
+    transition: top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.3s;
+    filter: drop-shadow(0 0 16px var(--orange)) drop-shadow(0 0 32px rgba(255, 140, 26, 0.5));
+    z-index: 5;
+    animation: swordFloat 1.5s ease-in-out infinite;
+    padding: 8px;
+    border-radius: 50%;
+  }
+  @keyframes swordFloat {
+    0%, 100% { transform: translate(-50%, -50%) rotate(-12deg) scale(1); }
+    50% { transform: translate(-50%, -50%) rotate(12deg) scale(1.08); }
+  }
+  .hp:hover { filter: drop-shadow(0 0 24px var(--orange)) drop-shadow(0 0 48px var(--orange)); }
+  .hp.caught {
+    animation: swordCaught 0.9s var(--ease-spring) forwards;
+    pointer-events: none;
+  }
+  @keyframes swordCaught {
+    0% { transform: translate(-50%, -50%) scale(1) rotate(0); }
+    30% { transform: translate(-50%, -50%) scale(1.8) rotate(-30deg); filter: drop-shadow(0 0 40px var(--green)); }
+    100% { transform: translate(-50%, -50%) scale(0) rotate(360deg); opacity: 0; filter: drop-shadow(0 0 60px var(--green)); }
+  }
+  .hp-zone .status-line {
+    position: absolute;
+    bottom: 12px; left: 0; right: 0;
+    text-align: center;
+    margin: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .sword-trail {
+    position: absolute;
+    width: 8px; height: 8px;
+    background: var(--orange);
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 12px var(--orange);
+    animation: trailFade 0.7s ease-out forwards;
+    z-index: 2;
+  }
+  @keyframes trailFade {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0); opacity: 0; }
+  }
+  .status-line { font-family: var(--font-mono); font-size: 12px; color: rgba(0, 255, 136, 0.5); margin-top: 20px; letter-spacing: 0.15em; text-transform: uppercase; }
+
+  /* ЗАДАНИЕ 2 */
+  .hint-box {
+    background: linear-gradient(135deg, rgba(255, 140, 26, 0.08), rgba(255, 140, 26, 0.02));
+    border-left: 3px solid var(--orange);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    padding: 14px 18px; font-size: 13px; line-height: 1.65;
+    color: #d4a373; margin: 16px 0 20px; font-weight: 500;
+  }
+  .hint-box b { color: var(--orange); }
+  .code-display { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: 0.4em; color: var(--green); text-align: center; margin: 12px 0 20px; min-height: 32px; text-shadow: 0 0 20px rgba(0, 255, 136, 0.6); }
+  .seq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .seq-btn { padding: 16px 12px; font-size: 12px; letter-spacing: 0.08em; }
+  .seq-btn.done { background: linear-gradient(180deg, var(--orange), #cc5a00); border-color: var(--orange); color: #000; pointer-events: none; box-shadow: 0 0 20px rgba(255, 140, 26, 0.5); }
+  .seq-btn.wrong { animation: shake 0.4s; border-color: var(--red); color: var(--red); }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+
+  /* ЗАДАНИЕ 3: БОСС */
+  .boss-arena {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 16px; align-items: end; padding: 30px 20px 20px;
+    background: radial-gradient(ellipse at bottom, rgba(255, 51, 85, 0.12), transparent 70%), linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+    border: 1px solid var(--border); border-radius: var(--r-md);
+    margin: 16px 0 20px; position: relative; overflow: hidden; min-height: 240px;
+  }
+  .fighter { text-align: center; transition: transform 0.15s; }
+  .fighter-emoji { font-size: clamp(48px, 10vw, 72px); display: block; line-height: 1; filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6)); transition: transform 0.2s; }
+  .fighter:not(.boss) .fighter-emoji { animation: fighterIdle 2s ease-in-out infinite; }
+  @keyframes fighterIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .fighter.boss .fighter-emoji { animation: bossIdle 1.2s ease-in-out infinite; }
+  @keyframes bossIdle { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-4px) scale(1.05); } }
+  .fighter-name { font-family: var(--font-display); font-size: 10px; letter-spacing: 0.2em; color: var(--green); margin-top: 10px; font-weight: 700; text-shadow: 0 0 10px currentColor; }
+  .fighter.boss .fighter-name { color: var(--red); }
+  .fighter-hp { width: 100%; height: 10px; background: rgba(0, 0, 0, 0.7); border: 1px solid var(--border); border-radius: 5px; margin-top: 10px; overflow: hidden; }
+  .fighter-hp-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); transition: width 0.25s ease-out; box-shadow: 0 0 12px rgba(0, 255, 136, 0.5); }
+  .fighter.boss .fighter-hp-fill { background: linear-gradient(90deg, var(--red), var(--orange)); box-shadow: 0 0 12px rgba(255, 51, 85, 0.5); }
+  .fighter.hit .fighter-emoji { animation: fighterHit 0.25s; }
+  @keyframes fighterHit { 0%, 100% { transform: translateX(0); filter: brightness(1); } 30% { transform: translateX(-8px); filter: brightness(3); } 60% { transform: translateX(6px); } }
+  .fighter.boss.hit .fighter-emoji { animation: fighterHitBoss 0.3s; }
+  @keyframes fighterHitBoss { 0%, 100% { transform: translateX(0) scale(1); filter: brightness(1); } 30% { transform: translateX(10px) scale(1.05); filter: brightness(3); } 60% { transform: translateX(-6px) scale(0.98); } }
+  .fighter.dead .fighter-emoji { animation: fighterDead 0.7s var(--ease-out) forwards; }
+  @keyframes fighterDead { 0% { transform: rotate(0) translateY(0); opacity: 1; } 100% { transform: rotate(-80deg) translateY(50px); opacity: 0.2; filter: grayscale(1); } }
+  .vs-badge { font-family: var(--font-display); font-size: 20px; font-weight: 900; color: var(--orange); text-shadow: 0 0 20px var(--orange); align-self: center; animation: vsPulse 1s infinite alternate; padding-bottom: 30px; }
+  @keyframes vsPulse { from { transform: scale(1); } to { transform: scale(1.15); } }
+  .boss-log { text-align: center; font-family: var(--font-mono); font-size: 12px; color: rgba(0, 255, 136, 0.5); margin-top: 12px; letter-spacing: 0.1em; min-height: 18px; }
+  .attack-btn { width: 100%; font-size: 16px; padding: 20px; margin-top: 16px; animation: attackGlow 1.5s ease-in-out infinite alternate; }
+  @keyframes attackGlow { from { box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); } to { box-shadow: 0 0 35px rgba(0, 255, 136, 0.7); } }
+
+  /* ВОПРОСЫ */
+  .answers { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+  .answer-btn { text-align: left; padding: 18px 22px; font-family: var(--font-body); font-size: 15px; font-weight: 600; text-transform: none; }
+  .answer-btn.correct { background: linear-gradient(180deg, var(--green), var(--green-dim)); color: #000; border-color: var(--green); animation: pulse 0.6s; box-shadow: 0 0 30px rgba(0, 255, 136, 0.6); }
+  .answer-btn.wrong { background: linear-gradient(180deg, var(--red), #b32541); color: #fff; border-color: var(--red); animation: shake 0.5s; }
+  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
+
+  /* РЕАКЦИЯ */
+  .reaction-info { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 16px; font-family: var(--font-mono); font-size: 12px; }
+  .reaction-info > div { flex: 1; padding: 10px 14px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); border-radius: var(--r-sm); text-align: center; }
+  .reaction-info-label { color: rgba(0, 255, 136, 0.5); font-size: 9px; letter-spacing: 0.15em; margin-bottom: 4px; text-transform: uppercase; }
+  .reaction-info-val { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--green); }
+  .reaction-info-val.red { color: var(--red); }
+  .reaction-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px auto; aspect-ratio: 1 / 1; max-width: 400px; width: 100%; }
+  .reaction-cell { background: rgba(0, 0, 0, 0.5); border: 2px solid var(--border); border-radius: var(--r-md); display: grid; place-items: center; font-size: clamp(36px, 8vw, 56px); cursor: pointer; transition: all 0.15s; min-height: 80px; user-select: none; }
+  .reaction-cell:active { transform: scale(0.96); }
+  .reaction-cell.enemy { background: radial-gradient(circle, rgba(255, 51, 85, 0.4), rgba(0, 0, 0, 0.5)); border-color: var(--red); box-shadow: 0 0 30px rgba(255, 51, 85, 0.6); animation: enemyPulse 0.4s infinite alternate; }
+  @keyframes enemyPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
+  .reaction-cell.hit { background: linear-gradient(180deg, var(--green), var(--green-dim)); border-color: var(--green); animation: cellHit 0.3s; }
+  @keyframes cellHit { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+  .reaction-cell.miss { background: rgba(255, 51, 85, 0.2); animation: shake 0.4s; }
+  .reaction-status { text-align: center; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 0.15em; color: var(--green); margin-top: 14px; min-height: 20px; text-transform: uppercase; }
+
+  /* ФИНАЛ */
+  .final-box { text-align: center; }
+  .trophy { font-size: 80px; margin-bottom: 16px; animation: trophyFloat 2.5s ease-in-out infinite; filter: drop-shadow(0 0 30px var(--orange)); }
+  @keyframes trophyFloat { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-14px) rotate(4deg); } }
+  .congrats-text {
+    text-align: left;
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.04), rgba(0, 0, 0, 0.3));
+    border: 1px solid var(--border); border-radius: var(--r-md);
+    padding: 22px; margin: 24px 0;
+    font-family: var(--font-mono); font-size: 13px;
+    line-height: 1.9; color: #b8cbb8;
+  }
+  .congrats-text .line { opacity: 0; animation: typeLine 0.4s forwards; display: block; margin-bottom: 2px; }
+  @keyframes typeLine { to { opacity: 1; } }
+  .congrats-text .green { color: var(--green); font-weight: 700; }
+  .congrats-text .highlight { color: var(--orange); font-weight: 700; }
+
+  /* WOLF QUOTES */
+  .wolf-quotes { margin: 28px 0 20px; display: none; flex-direction: column; gap: 18px; }
+  .wolf-quotes.show { display: flex; }
+  .wolf-quote {
+    position: relative;
+    text-align: left;
+    padding: 20px 24px 20px 68px;
+    background: linear-gradient(135deg, rgba(255, 140, 26, 0.08), rgba(0, 0, 0, 0.4));
+    border: 1px solid rgba(255, 140, 26, 0.3);
+    border-left: 4px solid var(--orange);
+    border-radius: 0 var(--r-md) var(--r-md) 0;
+    font-family: var(--font-body);
+    font-size: clamp(15px, 2vw, 17px);
+    font-weight: 600;
+    line-height: 1.65;
+    color: #e8d5b8;
+    letter-spacing: 0.01em;
+    box-shadow: 0 0 30px rgba(255, 140, 26, 0.15), inset 0 0 40px rgba(255, 140, 26, 0.03);
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+    overflow: hidden;
+  }
+  .wolf-quote.show { opacity: 1; transform: translateX(0); }
+  .wolf-quote::before {
+    content: '🐺';
+    position: absolute;
+    left: 20px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 28px;
+    filter: drop-shadow(0 0 12px var(--orange));
+    animation: wolfPulse 2s ease-in-out infinite;
+  }
+  @keyframes wolfPulse { 0%, 100% { transform: translateY(-50%) scale(1); } 50% { transform: translateY(-50%) scale(1.15); } }
+  .wolf-quote::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--orange), transparent);
+    opacity: 0.5;
+  }
+  .wolf-quote .speaking-indicator {
+    position: absolute;
+    top: 12px; right: 14px;
+    display: flex; gap: 3px; align-items: flex-end;
+    height: 14px; opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .wolf-quote.speaking .speaking-indicator { opacity: 1; }
+  .speaking-indicator span {
+    width: 3px;
+    background: var(--orange);
+    border-radius: 2px;
+    box-shadow: 0 0 6px var(--orange);
+    animation: waveBar 0.9s ease-in-out infinite;
+  }
+  .speaking-indicator span:nth-child(1) { height: 40%; animation-delay: 0s; }
+  .speaking-indicator span:nth-child(2) { height: 80%; animation-delay: 0.15s; }
+  .speaking-indicator span:nth-child(3) { height: 55%; animation-delay: 0.3s; }
+  .speaking-indicator span:nth-child(4) { height: 90%; animation-delay: 0.45s; }
+  .speaking-indicator span:nth-child(5) { height: 35%; animation-delay: 0.6s; }
+  @keyframes waveBar { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1.2); } }
+  .wolf-quote .q-cursor { display: inline-block; color: var(--orange); animation: blinkCur 0.7s steps(2, start) infinite; margin-left: 2px; }
+
+  .download-btn {
+    font-size: 15px; padding: 22px 44px;
+    background: linear-gradient(180deg, var(--orange), #cc5a00);
+    border-color: var(--orange); color: #000;
+    width: 100%; max-width: 100%;
+    animation: dlPulse 2s infinite;
+    box-shadow: 0 0 30px rgba(255, 140, 26, 0.4);
+    transform: none !important;
+  }
+  .download-btn:hover {
+    background: linear-gradient(180deg, var(--green), var(--green-dim)) !important;
+    border-color: var(--green) !important;
+    color: #000 !important;
+    transform: none !important;
+  }
+  .download-btn:active { transform: none !important; }
+  @keyframes dlPulse {
+    0%, 100% { box-shadow: 0 0 24px rgba(255, 140, 26, 0.4); }
+    50% { box-shadow: 0 0 44px rgba(255, 140, 26, 0.8), 0 0 80px rgba(255, 140, 26, 0.3); }
+  }
+  .refuse-btn { font-size: 11px; padding: 10px 18px; border-color: rgba(255, 51, 85, 0.5); color: var(--red); background: rgba(255, 51, 85, 0.05); margin-top: 12px; width: 100%; }
+  .refuse-btn:hover:not(:disabled) { background: var(--red) !important; border-color: var(--red) !important; color: #fff !important; box-shadow: 0 0 24px rgba(255, 51, 85, 0.6); }
+  .note { font-family: var(--font-mono); font-size: 10px; color: rgba(0, 255, 136, 0.35); margin-top: 12px; letter-spacing: 0.08em; text-align: center; }
+
+  .s-rank-block { margin-top: 32px; padding-top: 28px; border-top: 1px dashed var(--border); text-align: center; }
+  .s-rank-label { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.3em; color: var(--orange); margin-bottom: 16px; }
+  #s-rank { font-family: var(--font-display); font-size: clamp(72px, 18vw, 110px); font-weight: 900; color: var(--orange); text-shadow: 0 0 40px var(--orange), 0 0 80px var(--orange); line-height: 1; letter-spacing: 0.1em; animation: sRankPulse 1.5s infinite alternate; margin-bottom: 20px; }
+  @keyframes sRankPulse { from { transform: scale(1); filter: brightness(1); } to { transform: scale(1.05); filter: brightness(1.3); } }
+  .s-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: left; }
+  .s-stat { background: linear-gradient(135deg, rgba(0, 255, 136, 0.04), rgba(0, 0, 0, 0.2)); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 12px 14px; }
+  .s-stat-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em; color: rgba(0, 255, 136, 0.5); margin-bottom: 6px; text-transform: uppercase; }
+  .s-stat-val { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--green); }
+
+  .qr-block { margin-top: 32px; padding-top: 28px; border-top: 1px dashed var(--border); text-align: center; }
+  .qr-title { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.25em; color: var(--orange); margin-bottom: 16px; }
+  .qr-frame { display: inline-block; padding: 16px; background: #fff; border-radius: var(--r-md); box-shadow: 0 0 30px rgba(0, 255, 136, 0.3), 0 0 80px rgba(0, 255, 136, 0.15); line-height: 0; }
+  .qr-frame img, .qr-frame canvas { display: block; border-radius: 6px; }
+  .qr-hint { font-family: var(--font-mono); font-size: 10px; color: rgba(0, 255, 136, 0.4); margin-top: 14px; letter-spacing: 0.1em; }
+
+  .sidebar { display: none; flex-direction: column; gap: 16px; }
+  .widget { background: var(--panel); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--border); border-radius: var(--r-md); padding: 18px; position: relative; overflow: hidden; }
+  .widget::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--green), transparent); opacity: 0.4; }
+  .widget-title { font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.25em; color: var(--orange); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
+  .widget-title::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+  .progress-widget { text-align: center; padding: 24px 18px; }
+  .lv-display { font-family: var(--font-display); font-size: 44px; font-weight: 900; background: linear-gradient(135deg, var(--green), var(--cyan), var(--purple)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 6px; filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.5)); }
+  .lv-label { font-family: var(--font-mono); font-size: 10px; color: rgba(0, 255, 136, 0.5); letter-spacing: 0.2em; margin-bottom: 14px; }
+  .lv-xp-bar { height: 6px; background: rgba(0, 0, 0, 0.6); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+  .lv-xp-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--green), var(--cyan)); transition: width 0.9s var(--ease-spring); box-shadow: 0 0 12px var(--green); }
+  .lv-xp-text { font-family: var(--font-mono); font-size: 10px; color: rgba(0, 255, 136, 0.4); }
+  .pelmeni-widget-v2 { text-align: center; }
+  .pelmeni-count-big { font-family: var(--font-display); font-size: 40px; font-weight: 900; color: var(--orange); text-shadow: 0 0 24px rgba(255, 140, 26, 0.7); line-height: 1; margin: 6px 0 4px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .pelmeni-icon-big { font-size: 34px; filter: drop-shadow(0 0 12px var(--orange)); transition: transform 0.2s; display: inline-block; }
+  .pelmeni-icon-big.pop { animation: pPop 0.4s var(--ease-spring); }
+  @keyframes pPop { 0% { transform: scale(1); } 40% { transform: scale(1.5) rotate(-25deg); } 100% { transform: scale(1); } }
+  .pelmeni-sub { font-family: var(--font-mono); font-size: 10px; color: rgba(255, 140, 26, 0.5); letter-spacing: 0.15em; text-transform: uppercase; }
+  .log-widget { max-height: 240px; overflow: hidden; }
+  .log-list { display: flex; flex-direction: column; gap: 4px; font-family: var(--font-mono); font-size: 10px; line-height: 1.5; color: rgba(0, 255, 136, 0.55); }
+  .log-line { animation: logIn 0.35s var(--ease-out); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 2px 0; }
+  .log-line.ok { color: var(--green); } .log-line.warn { color: var(--orange); } .log-line.err { color: var(--red); } .log-line.info { color: var(--cyan); }
+  @keyframes logIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
+  .ach-list { display: flex; flex-direction: column; gap: 8px; }
+  .ach-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: rgba(0, 255, 136, 0.03); border: 1px solid rgba(0, 255, 136, 0.1); border-radius: var(--r-sm); font-size: 11px; animation: achItemIn 0.5s var(--ease-spring); }
+  @keyframes achItemIn { from { opacity: 0; transform: translateX(-10px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
+  .ach-item-icon { font-size: 20px; flex-shrink: 0; }
+  .ach-item-body { min-width: 0; flex: 1; }
+  .ach-item-title { font-family: var(--font-display); font-weight: 700; font-size: 10px; letter-spacing: 0.1em; color: var(--orange); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ach-item-desc { font-size: 10px; color: rgba(0, 255, 136, 0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ach-empty { font-size: 11px; color: rgba(0, 255, 136, 0.3); text-align: center; padding: 12px; font-style: italic; }
+
+  .mobile-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 5000; padding: 12px 16px calc(12px + var(--safe-bottom)); background: linear-gradient(180deg, transparent, rgba(5, 7, 5, 0.95) 30%); pointer-events: none; }
+  .mobile-bar-inner { display: flex; gap: 8px; align-items: stretch; pointer-events: auto; }
+  .mobile-stat { flex: 1; background: var(--panel); backdrop-filter: blur(20px) saturate(1.5); -webkit-backdrop-filter: blur(20px) saturate(1.5); border: 1px solid var(--border); border-radius: var(--r-md); padding: 10px 12px; display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 11px; min-width: 0; }
+  .mobile-stat-icon { font-size: 18px; flex-shrink: 0; }
+  .mobile-stat-val { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: var(--green); white-space: nowrap; }
+  .mobile-stat-lvl .mobile-stat-val { background: linear-gradient(135deg, var(--green), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .mobile-stat-pel .mobile-stat-val { color: var(--orange); }
+
+  .achievement-toast {
+    position: fixed; top: calc(16px + var(--safe-top)); right: -420px;
+    min-width: 280px; max-width: min(380px, calc(100vw - 32px));
+    background: linear-gradient(135deg, rgba(16, 23, 16, 0.95), rgba(26, 36, 26, 0.95));
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--orange); border-radius: var(--r-md);
+    padding: 14px 18px; display: flex; gap: 14px; align-items: center;
+    z-index: 9996;
+    box-shadow: 0 0 40px rgba(255, 140, 26, 0.5), 0 20px 60px rgba(0, 0, 0, 0.5);
+    transition: right 0.55s var(--ease-spring);
+  }
+  .achievement-toast.show { right: 16px; }
+  .ach-icon { font-size: 32px; filter: drop-shadow(0 0 12px var(--orange)); animation: achIconPulse 1.2s infinite alternate; flex-shrink: 0; }
+  @keyframes achIconPulse { from { transform: scale(1); } to { transform: scale(1.15); } }
+  .ach-body { flex: 1; min-width: 0; }
+  .ach-title { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: var(--orange); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 3px; text-shadow: 0 0 12px var(--orange); }
+  .ach-desc { font-size: 11px; color: rgba(255, 255, 255, 0.6); }
+
+  .float-text { position: fixed; font-family: var(--font-display); font-weight: 900; font-size: 22px; pointer-events: none; z-index: 9992; text-shadow: 0 0 15px currentColor, 0 0 30px currentColor; animation: floatUp 1s var(--ease-out) forwards; transform: translate(-50%, -50%); }
+  @keyframes floatUp { 0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; } 20% { transform: translate(-50%, -80%) scale(1.3); opacity: 1; } 100% { transform: translate(-50%, -220%) scale(1.7); opacity: 0; } }
+  .level-up { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0) rotate(-20deg); font-family: var(--font-display); font-size: clamp(36px, 9vw, 82px); font-weight: 900; color: var(--orange); text-shadow: 0 0 40px var(--orange), 0 0 80px var(--orange); letter-spacing: 0.1em; z-index: 9994; pointer-events: none; text-align: center; animation: levelUp 1.8s var(--ease-out) forwards; }
+  .level-up .lvl-sub { display: block; font-size: 0.3em; color: var(--green); letter-spacing: 0.4em; margin-top: 16px; }
+  @keyframes levelUp { 0% { transform: translate(-50%, -50%) scale(0) rotate(-25deg); opacity: 0; } 25% { transform: translate(-50%, -50%) scale(1.25) rotate(8deg); opacity: 1; } 45% { transform: translate(-50%, -50%) scale(1) rotate(-3deg); opacity: 1; } 60% { transform: translate(-50%, -50%) scale(1.05) rotate(0); opacity: 1; } 85% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(2.3); opacity: 0; } }
+  .glitch { animation: glitch 0.35s; }
+  @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-3px, 2px); } 40% { transform: translate(3px, -2px); } 60% { transform: translate(-2px, -2px); } 100% { transform: translate(0); } }
+
+  /* BSOD */
+  #bsod { position: fixed; inset: 0; z-index: 10001; background: #0078D7; color: #fff; display: flex; flex-direction: column; justify-content: center; padding: 8vh 8vw; font-family: 'Segoe UI', 'Rajdhani', sans-serif; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+  #bsod.show { opacity: 1; pointer-events: auto; }
+  .bsod-face { font-family: 'Segoe UI', sans-serif; font-weight: 200; font-size: clamp(60px, 14vw, 140px); line-height: 1; margin-bottom: 24px; }
+  .bsod-text { font-size: clamp(14px, 1.7vw, 20px); line-height: 1.6; max-width: 900px; }
+  .bsod-text .b-big { display: block; margin-bottom: 24px; }
+  .bsod-text .b-line { display: block; margin-bottom: 8px; opacity: 0.95; }
+  .bsod-text .b-small { font-size: 0.85em; opacity: 0.85; }
+  .bsod-text .b-code { font-family: 'Consolas', monospace; background: rgba(0, 0, 0, 0.15); padding: 2px 8px; border-radius: 3px; }
+  .bsod-bar { margin-top: 30px; max-width: 900px; display: flex; align-items: center; gap: 14px; }
+  .bsod-bar-track { flex: 1; height: 6px; background: rgba(255, 255, 255, 0.25); position: relative; overflow: hidden; }
+  .bsod-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: #fff; transition: width 0.15s linear; }
+  .bsod-percent { min-width: 60px; text-align: right; font-family: 'Consolas', monospace; font-weight: 700; }
+  .bsod-footer { margin-top: 40px; font-size: clamp(12px, 1.3vw, 15px); max-width: 900px; opacity: 0.9; }
+  .blink-bsod { animation: bsodBlink 1s steps(2, start) infinite; }
+  @keyframes bsodBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
+  .bsod-reboot { position: fixed; inset: 0; background: #000; z-index: 10002; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 24px; font-family: var(--font-mono); color: var(--green); }
+  .bsod-reboot.show { display: flex; }
+  .reboot-text { font-family: var(--font-display); font-size: 14px; letter-spacing: 0.4em; text-shadow: 0 0 16px var(--green); }
+  .reboot-bar { width: min(60%, 400px); height: 4px; background: #111811; border-radius: 2px; position: relative; overflow: hidden; }
+  .reboot-bar-fill { position: absolute; inset: 0 auto 0 0; width: 0%; background: linear-gradient(90deg, var(--green), var(--cyan)); box-shadow: 0 0 16px var(--green); transition: width 0.1s linear; }
+  .reboot-perc { font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--orange); text-shadow: 0 0 20px var(--orange); }
+
+  /* АДАПТИВ */
+  @media (min-width: 640px) {
+    .app-grid { gap: 24px; }
+    .main-panel { padding: 36px; }
+    .boot-ascii { font-size: 12px; display: block; }
+    .seq-grid { gap: 14px; }
+    .seq-btn { padding: 20px 16px; font-size: 13px; }
+  }
+  @media (min-width: 1024px) {
+    #app { padding: 24px; }
+    .app-grid { grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+    .main-panel { padding: 40px; }
+    .sidebar { display: flex; position: sticky; top: 24px; max-height: calc(100dvh - 48px); overflow-y: auto; }
+    .boot-inner { grid-template-columns: 1.2fr 1fr; align-items: center; }
+    .boot-ascii { grid-column: 2; grid-row: 1 / 3; align-self: center; font-size: 11px; }
+  }
+  @media (min-width: 1400px) {
+    .app-grid { grid-template-columns: 1fr 380px; gap: 32px; }
+    .main-panel { padding: 48px; }
+  }
+  @media (max-width: 1023px) { .mobile-bar { display: block; } #app { padding-bottom: calc(100px + var(--safe-bottom)); } }
+  @media (max-width: 480px) {
+    .main-panel { padding: 22px 18px; border-radius: var(--r-md); }
+    .hp { font-size: 48px; }
+    .code-display { font-size: 18px; }
+    .seq-btn { font-size: 11px; padding: 14px 8px; }
+    .wolf-quote { padding: 16px 18px 16px 56px; font-size: 14px; }
+    .wolf-quote::before { font-size: 22px; left: 16px; }
+    .brand-title { font-size: 13px; }
+    .brand-sub { display: none; }
+    .icon-btn { width: 40px; height: 40px; min-height: 40px; font-size: 16px; }
+    .hp-zone { min-height: 260px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body class="no-scroll">
+
+<div id="crt-overlay"></div>
+<canvas id="matrix-canvas"></canvas>
+<canvas id="fx-canvas"></canvas>
+<div id="flash"></div>
+
+<div id="boot">
+  <div class="boot-inner">
+    <pre class="boot-ascii">   ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  █ BIRTHDAY_OS v6.0 █
+   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+    ╔══════════════╗
+    ║  ▲ ⚔️ 🔥 🐺 ║
+    ╚══════════════╝
+     [ ANIME EDITION ]</pre>
+    <div>
+      <div class="boot-logo">▲ BIRTHDAY_OS v6.0 ▲</div>
+      <div class="boot-terminal">
+        <div class="boot-terminal-inner">
+          <pre id="boot-text"></pre>
+          <div id="boot-cmd">
+            <input type="text" id="boot-input" placeholder="введи команду (help)..." autocomplete="off" autocapitalize="off" spellcheck="false">
+            <div id="boot-out"></div>
+          </div>
+        </div>
+      </div>
+      <div id="boot-prompt">PRESS ANY KEY <span class="blink-cur">▊</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="app-grid">
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-mark">M</div>
+        <div class="brand-text">
+          <div class="brand-title">ОПЕРАЦИЯ «МАКСИМ»</div>
+          <div class="brand-sub">// v6.0 ANIME · СЕКРЕТНО</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn secret-btn" id="secret-btn" title="Очистить корзину">🗑️</button>
+        <button class="icon-btn" id="music-btn" title="Фоновая музыка">🔇</button>
+      </div>
+    </header>
+
+    <main class="main-panel">
+      <div class="xp-bar">
+        <div class="xp-fill" id="xp-fill"></div>
+        <div class="xp-label" id="xp-label">LVL 1 · XP 0%</div>
+      </div>
+      <div class="steps" id="steps-bar">
+        <div class="step active"></div><div class="step"></div><div class="step"></div>
+        <div class="step"></div><div class="step"></div><div class="step"></div>
+        <div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div>
+      </div>
+
+      <!-- ЭКРАН 0 -->
+      <section class="screen active" id="screen-0">
+        <span class="screen-tag">Входящий пакет</span>
+        <h1 class="screen-title">Добро пожаловать, боец</h1>
+        <p class="screen-desc"><span class="hl-orange">Товарищ Максим!</span> Сегодня твой <span class="hl-green">респавн</span>. Генштаб (в лице Вики) подготовил бафф. Но чтобы его получить — пройди <span class="hl-orange">боевую подготовку</span>.</p>
+        <p class="screen-desc">Впереди: <span class="hl-green">погоня за клинком</span>, <span class="hl-green">орден истребителей</span>, <span class="hl-green">бой с боссом</span>, <span class="hl-green">аниме-вопросы</span> и <span class="hl-green">тест реакции</span>.</p>
+        <button class="btn-center" style="margin-top:24px;width:100%;" onclick="goTo(1)">▶ НАЧАТЬ ОПЕРАЦИЮ</button>
+      </section>
+
+      <!-- ЭКРАН 1: ПОЙМАЙ МЕЧ -->
+      <section class="screen" id="screen-1">
+        <span class="screen-tag">Задание 1 · Поймай Ничирин</span>
+        <h1 class="screen-title">Поймай меч Танджиро!</h1>
+        <p class="screen-desc">
+          Генштаб спрятал <span class="hl-orange">Ничирин-меч</span> — он бегает по арене.
+          Кликни по нему, пока он не телепортировался. Слышишь? Он быстрый, как дыхание грома.
+        </p>
+        <div class="hp-zone" id="hp-zone">
+          <div class="hp" id="hp" onclick="catchSword(event)">⚔️</div>
+          <div class="status-line" id="hp-status">СИГНАЛ: МЕЧ УСКОЛЬЗАЕТ...</div>
+        </div>
+      </section>
+
+      <!-- ЭКРАН 2: КОД -->
+      <section class="screen" id="screen-2">
+        <span class="screen-tag">Задание 2 · Орден истребителей</span>
+        <h1 class="screen-title">Расставь героев по порядку</h1>
+        <p class="screen-desc">Нажимай кнопки в правильном порядке. Ошибёшься — последовательность сбросится.</p>
+        <div class="hint-box">
+          💡 <b>Разведданные:</b> это герои аниме <b>«Клинок, рассекающий демонов»</b>.
+          Расставь их в порядке появления в аниме — от первого к последнему.
+        </div>
+        <div class="code-display" id="code-display">_ _ _ _</div>
+        <div class="seq-grid">
+          <button class="seq-btn" data-key="zenitsu">⚡ ДЗЕНИЦУ</button>
+          <button class="seq-btn" data-key="inoske">🐗 ИНОСКЕ</button>
+          <button class="seq-btn" data-key="tanjiro">🔥 ТАНДЖИРО</button>
+          <button class="seq-btn" data-key="nezuko">🎀 НЕЗУКО</button>
+        </div>
+      </section>
+
+      <!-- ЭКРАН 3: БОСС -->
+      <section class="screen" id="screen-3">
+        <span class="screen-tag">Задание 3 · Босс-файт</span>
+        <h1 class="screen-title">Убей босса, боец!</h1>
+        <p class="screen-desc">Ты (в очках) против босса. Кликай <span class="hl-orange">АТАКА</span> — бей по HP.</p>
+        <div class="boss-arena" id="boss-arena">
+          <div class="fighter" id="fighter-hero">
+            <span class="fighter-emoji">🤓</span>
+            <div class="fighter-name">МАКСИМ</div>
+            <div class="fighter-hp"><div class="fighter-hp-fill" id="hero-hp"></div></div>
+          </div>
+          <div class="vs-badge">VS</div>
+          <div class="fighter boss" id="fighter-boss">
+            <span class="fighter-emoji">👹</span>
+            <div class="fighter-name">БОСС</div>
+            <div class="fighter-hp"><div class="fighter-hp-fill" id="boss-hp"></div></div>
+          </div>
+        </div>
+        <div class="boss-log" id="boss-log">НАЖМИ «АТАКА» ЧТОБЫ НАЧАТЬ БОЙ</div>
+        <button class="attack-btn" id="attack-btn">⚔️ АТАКА</button>
+      </section>
+
+      <!-- ЭКРАН 4: SAO -->
+      <section class="screen" id="screen-4">
+        <span class="screen-tag">Задание 4 · Sword Art Online</span>
+        <h1 class="screen-title">Как зовут главного героя SAO?</h1>
+        <p class="screen-desc">Ты застрял в Нейролинкере. Вспомни имя — или останешься в игре навсегда.</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true">🗡️ Кирито</button>
+          <button class="answer-btn" data-correct="false">🌸 Асуна</button>
+          <button class="answer-btn" data-correct="false">🧝 Лифа</button>
+        </div>
+      </section>
+
+      <!-- ЭКРАН 5: DOTA -->
+      <section class="screen" id="screen-5">
+        <span class="screen-tag">Задание 5 · Dota 2</span>
+        <h1 class="screen-title">Ты в пабе Dota 2. Что делает команда?</h1>
+        <p class="screen-desc">Мид снова проигран. Все 4 союзника на месте.</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true">🤬 Пишут «мид виноват» в чат и пикают ещё</button>
+          <button class="answer-btn" data-correct="false">🧠 Спокойно предлагают тактику и выигрывают</button>
+          <button class="answer-btn" data-correct="false">☕ Идут пить чай и забывают про игру</button>
+        </div>
+      </section>
+
+      <!-- ЭКРАН 6: НАУШНИКИ -->
+      <section class="screen" id="screen-6">
+        <span class="screen-tag">Задание 6 · Проверка памяти</span>
+        <h1 class="screen-title">Что подарила тебе Вика на день рождения?</h1>
+        <div class="answers">
+          <button class="answer-btn" data-correct="false">🧦 Носки с оленями</button>
+          <button class="answer-btn" data-correct="true">🎧 Дорогие наушники (имба!)</button>
+          <button class="answer-btn" data-correct="false">🍳 Сковородку (чтоб готовил)</button>
+        </div>
+      </section>
+
+      <!-- ЭКРАН 7: КИБЕРПАНК -->
+      <section class="screen" id="screen-7">
+        <span class="screen-tag">Задание 7 · Cyberpunk 2077</span>
+        <h1 class="screen-title">Ты в Найт-Сити. Как зовут главного героя?</h1>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true">🅥 V</button>
+          <button class="answer-btn" data-correct="false">🤘 Johnny Silverhand</button>
+          <button class="answer-btn" data-correct="false">🍺 Jackie Welles</button>
+        </div>
+      </section>
+
+      <!-- ЭКРАН 8: РЕАКЦИЯ -->
+      <section class="screen" id="screen-8">
+        <span class="screen-tag">Задание 8 · Реакция бойца</span>
+        <h1 class="screen-title">Успей кликнуть по врагу!</h1>
+        <p class="screen-desc">Враг появляется в одной из 4 ячеек. <span class="hl-green">5 попаданий</span> — победа. <span class="hl-red">3 промаха</span> — провал.</p>
+        <div class="reaction-info">
+          <div><div class="reaction-info-label">Попаданий</div><div class="reaction-info-val" id="react-hits">0/5</div></div>
+          <div><div class="reaction-info-label">Промахов</div><div class="reaction-info-val red" id="react-miss">0/3</div></div>
+          <div><div class="reaction-info-label">Реакция</div><div class="reaction-info-val" id="react-time">— мс</div></div>
+        </div>
+        <div class="reaction-grid" id="reaction-grid">
+          <div class="reaction-cell" data-cell="0"></div>
+          <div class="reaction-cell" data-cell="1"></div>
+          <div class="reaction-cell" data-cell="2"></div>
+          <div class="reaction-cell" data-cell="3"></div>
+        </div>
+        <div class="reaction-status" id="reaction-status">ЖМИ «СТАРТ»</div>
+        <button class="attack-btn" id="react-start-btn">▶ СТАРТ</button>
+      </section>
+
+      <!-- ЭКРАН 9: ФИНАЛ -->
+      <section class="screen" id="screen-9">
+        <div class="final-box">
+          <div class="trophy">🏆</div>
+          <span class="screen-tag" style="display:inline-flex;">Операция завершена</span>
+          <h1 class="screen-title" style="text-align:center;">Квест пройден. Докладываю!</h1>
+
+          <div class="congrats-text" id="congrats"></div>
+
+          <div class="wolf-quotes" id="wolf-quotes">
+            <div class="wolf-quote" id="wolf-q1">
+              <div class="speaking-indicator"><span></span><span></span><span></span><span></span><span></span></div>
+              <span class="q-text" id="wolf-q1-text"></span><span class="q-cursor" id="wolf-q1-cur">▊</span>
+            </div>
+            <div class="wolf-quote" id="wolf-q2">
+              <div class="speaking-indicator"><span></span><span></span><span></span><span></span><span></span></div>
+              <span class="q-text" id="wolf-q2-text"></span><span class="q-cursor" id="wolf-q2-cur">▊</span>
+            </div>
+          </div>
+
+          <a href="activator.zip" download="activator.zip" class="btn download-btn" id="dl-btn">📦 СКАЧАТЬ СЕКРЕТНЫЙ ПАКЕТ</a>
+          <div class="note">↑ активатор Windows · Microsoft Office · Касперский</div>
+
+          <button class="refuse-btn" id="refuse-btn">🚫 НЕ СКАЧИВАТЬ</button>
+
+          <div class="s-rank-block">
+            <div class="s-rank-label">▼ РЕЙТИНГ ПРОХОЖДЕНИЯ ▼</div>
+            <div id="s-rank">S</div>
+            <div class="s-stats" id="s-stats"></div>
+          </div>
+
+          <div class="qr-block">
+            <div class="qr-title">▼ QR-КОД ДЛЯ ПЕРЕДАЧИ САЙТА ▼</div>
+            <div class="qr-frame" id="qrcode"></div>
+            <div class="qr-hint">Наведи камеру телефона — сайт откроется сам</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="sidebar">
+      <div class="widget progress-widget">
+        <div class="widget-title">Боевой статус</div>
+        <div class="lv-display" id="side-lv">1</div>
+        <div class="lv-label">УРОВЕНЬ БОЙЦА</div>
+        <div class="lv-xp-bar"><div class="lv-xp-fill" id="side-xp-fill"></div></div>
+        <div class="lv-xp-text" id="side-xp-text">0 / 25 XP</div>
+      </div>
+
+      <div class="widget pelmeni-widget-v2">
+        <div class="widget-title">Съедено пельменей</div>
+        <div class="pelmeni-count-big">
+          <span class="pelmeni-icon-big" id="p-icon-side">🥟</span>
+          <span id="p-count-side">0</span>
+        </div>
+        <div class="pelmeni-sub">живой счётчик · тикает сам</div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title">Ачивки <span style="margin-left:auto;color:rgba(0,255,136,0.5);font-family:var(--font-mono);" id="ach-counter">0/12</span></div>
+        <div class="ach-list" id="ach-list">
+          <div class="ach-empty">Пока ничего. Вперёд, боец!</div>
+        </div>
+      </div>
+
+      <div class="widget log-widget">
+        <div class="widget-title">Боевой журнал</div>
+        <div class="log-list" id="log-list"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="mobile-bar">
+  <div class="mobile-bar-inner">
+    <div class="mobile-stat mobile-stat-lvl">
+      <span class="mobile-stat-icon">⚡</span>
+      <div><div style="font-size:9px;color:rgba(0,255,136,0.5);">LVL</div><div class="mobile-stat-val" id="mob-lv">1</div></div>
+    </div>
+    <div class="mobile-stat mobile-stat-pel">
+      <span class="mobile-stat-icon">🥟</span>
+      <div><div style="font-size:9px;color:rgba(255,140,26,0.6);">ПЕЛЬМЕНИ</div><div class="mobile-stat-val" id="mob-pel">0</div></div>
+    </div>
+    <div class="mobile-stat" style="flex:0.6;">
+      <span class="mobile-stat-icon">🏅</span>
+      <div><div style="font-size:9px;color:rgba(0,255,136,0.5);">АЧИВКИ</div><div class="mobile-stat-val" id="mob-ach">0</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="bsod">
+  <div class="bsod-face">:(</div>
+  <div class="bsod-text">
+    <span class="b-big">На вашем устройстве возникла проблема, и его необходимо перезагрузить.</span>
+    <span class="b-line"><span class="b-code">STOP_CODE:</span> HAPPY_BIRTHDAY_OVERFLOW_0x000000FF</span>
+    <span class="b-line b-small"><span class="b-code">WHAT_FAILED:</span> BIRTHDAY_CAKE.EXE · VIKA.LOVE_DRIVER · NICHIRIN_SWORD.AUDIO</span>
+    <span class="b-line b-small"><span class="b-code">DIAGNOSIS:</span> Генштаб загрузил в систему слишком много счастья.</span>
+  </div>
+  <div class="bsod-bar">
+    <div class="bsod-bar-track"><div class="bsod-bar-fill" id="bsod-bar-fill"></div></div>
+    <div class="bsod-percent" id="bsod-percent">0%</div>
+  </div>
+  <div class="bsod-footer">⚠️ <span class="blink-bsod">НЕ ВЫКЛЮЧАЙТЕ КОМПЬЮТЕР.</span><br>Он просто очень рад за тебя, Максим. 🎂</div>
+</div>
+
+<div class="bsod-reboot" id="bsod-reboot">
+  <div class="reboot-text">REBOOTING BIRTHDAY_OS ...</div>
+  <div class="reboot-bar"><div class="reboot-bar-fill" id="reboot-bar-fill"></div></div>
+  <div class="reboot-perc" id="reboot-perc">0%</div>
+</div>
+
+<script>
+  const SITE_URL = "https://example.com/maxim-birthday";
+  const stats = { clicks: 0, maxCombo: 0, errors: 0, achievements: 0, timeStart: 0, timeFinish: 0, konamiFound: false, voicePlayed: false, bsodShown: false };
+  let pelmeni = 0;
+  const ACH_LIST = [];
+
+  const WOLF_QUOTES = [
+    "Будь в жизни волком. Волк не боится схваток — потому что рожает волчица.",
+    "Влюблённый волк уже не хищник, а пушистик. Не унывай, не огорчайся. Наплюй на зависть и на лесть. Ни перед кем не прогибайся — и будь таким, какой ты есть."
+  ];
+
+  /* АУДИО */
+  let audioCtx = null, masterGain = null;
+  function initAudio() {
+    if (audioCtx) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.14;
+      masterGain.connect(audioCtx.destination);
+    } catch(e) {}
+  }
+  function tone(freq, dur, type = 'square', vol = 0.15, slideTo = null) {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.setValueAtTime(freq, now);
+    if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, now + dur);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(vol, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    osc.connect(gain); gain.connect(masterGain);
+    osc.start(now); osc.stop(now + dur);
+  }
+  function sfx(t) {
+    if (!audioCtx) return;
+    switch(t) {
+      case 'click': tone(880, 0.06, 'square', 0.10, 1400); break;
+      case 'success': tone(660, 0.10, 'square', 0.12); setTimeout(() => tone(880, 0.12, 'square', 0.12), 80); setTimeout(() => tone(1320, 0.20, 'square', 0.14), 170); break;
+      case 'error': tone(140, 0.30, 'sawtooth', 0.18, 60); break;
+      case 'levelup': [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 0.14, 'square', 0.14), i * 75)); break;
+      case 'achieve': [784, 1046, 1318].forEach((f, i) => setTimeout(() => tone(f, 0.10, 'triangle', 0.13), i * 60)); break;
+      case 'xp': tone(1600, 0.04, 'triangle', 0.08); break;
+      case 'firework': tone(200, 0.35, 'sawtooth', 0.10, 40); break;
+      case 'konami': [262, 330, 392, 523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 0.10, 'square', 0.12), i * 65)); break;
+      case 'pelmeni': tone(700 + Math.random() * 400, 0.05, 'triangle', 0.08); break;
+      case 'bsod': tone(200, 0.6, 'sawtooth', 0.20, 40); setTimeout(() => tone(150, 0.5, 'square', 0.15, 30), 300); break;
+      case 'reboot': [400, 600, 800, 1200].forEach((f, i) => setTimeout(() => tone(f, 0.15, 'triangle', 0.12), i * 100)); break;
+      case 'hit': tone(300, 0.06, 'sawtooth', 0.15, 120); break;
+      case 'whoosh': tone(1200, 0.15, 'sine', 0.08, 300); break;
+    }
+  }
+
+  /* CANVAS */
+  const canvas = document.getElementById('fx-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  resizeCanvas();
+  addEventListener('resize', resizeCanvas);
+
+  function spawnBurst(x, y, count = 14, hue = null, power = 1) {
+    const bh = hue !== null ? hue : Math.floor(Math.random() * 360);
+    for (let i = 0; i < count; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = (1.5 + Math.random() * 4) * power;
+      particles.push({
+        x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+        life: 1, decay: 0.018 + Math.random() * 0.022,
+        color: `hsl(${bh + Math.random() * 60 - 30}, 100%, ${60 + Math.random() * 25}%)`,
+        size: 1.5 + Math.random() * 2.5, gravity: 0.08
+      });
+    }
+  }
+  function spawnFirework(x, y) {
+    sfx('firework');
+    const hue = Math.floor(Math.random() * 360);
+    const count = 70 + Math.floor(Math.random() * 40);
+    for (let i = 0; i < count; i++) {
+      const a = (Math.PI * 2 * i) / count + Math.random() * 0.15;
+      const s = 2 + Math.random() * 5.5;
+      particles.push({
+        x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+        life: 1, decay: 0.008 + Math.random() * 0.014,
+        color: `hsl(${hue + Math.random() * 50 - 25}, 100%, ${62 + Math.random() * 20}%)`,
+        size: 1.8 + Math.random() * 2.2, gravity: 0.045
+      });
+    }
+  }
+  function fxLoop() {
+    if (particles.length === 0) { ctx.clearRect(0, 0, canvas.width, canvas.height); requestAnimationFrame(fxLoop); return; }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.vy += p.gravity; p.x += p.vx; p.y += p.vy;
+      p.vx *= 0.985; p.vy *= 0.985;
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    requestAnimationFrame(fxLoop);
+  }
+  fxLoop();
+
+  /* МАТРИЦА */
+  const mCanvas = document.getElementById('matrix-canvas');
+  const mCtx = mCanvas.getContext('2d');
+  const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ刀剣戦鬼龍火水呼吸全集中';
+  const FONT_SIZE = 16;
+  let cols, drops, mW, mH;
+  function initMatrix() {
+    mW = mCanvas.width = innerWidth;
+    mH = mCanvas.height = innerHeight;
+    cols = Math.floor(mW / FONT_SIZE);
+    drops = new Array(cols).fill(1);
+  }
+  initMatrix();
+  addEventListener('resize', initMatrix);
+  function matrixLoop() {
+    mCtx.fillStyle = 'rgba(5, 7, 5, 0.08)';
+    mCtx.fillRect(0, 0, mW, mH);
+    mCtx.font = FONT_SIZE + 'px "JetBrains Mono", monospace';
+    for (let i = 0; i < cols; i++) {
+      const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
+      const x = i * FONT_SIZE;
+      const y = drops[i] * FONT_SIZE;
+      mCtx.fillStyle = Math.random() < 0.08 ? '#cfffdd' : '#00ff88';
+      mCtx.fillText(ch, x, y);
+      if (y > mH && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(matrixLoop, 55);
+
+  /* LOG */
+  const logList = document.getElementById('log-list');
+  function logEvent(text, type = 'info') {
+    const t = new Date();
+    const ts = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;
+    const el = document.createElement('div');
+    el.className = 'log-line ' + type;
+    el.textContent = `[${ts}] ${text}`;
+    logList.appendChild(el);
+    while (logList.children.length > 8) logList.removeChild(logList.firstChild);
+  }
+
+  const flashEl = document.getElementById('flash');
+  function screenFlash() { flashEl.classList.add('fire'); setTimeout(() => flashEl.classList.remove('fire'), 90); }
+
+  function floatText(x, y, text, color = '#00ff88') {
+    const el = document.createElement('div');
+    el.className = 'float-text'; el.textContent = text;
+    el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.color = color;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+  function showLevelUp(level) {
+    sfx('levelup'); screenFlash();
+    const el = document.createElement('div');
+    el.className = 'level-up';
+    el.innerHTML = `LEVEL UP!<span class="lvl-sub">LVL ${level} · БОЕЦ</span>`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1800);
+    const cx = innerWidth / 2, cy = innerHeight / 2;
+    for (let i = 0; i < 3; i++) setTimeout(() => spawnBurst(cx + (Math.random()-0.5)*200, cy + (Math.random()-0.5)*120, 40, null, 1.6), i * 120);
+    logEvent(`LEVEL UP → LVL ${level}`, 'ok');
+  }
+  function shake() {
+    const c = document.querySelector('.main-panel');
+    if (!c) return;
+    c.classList.remove('shaking'); void c.offsetWidth; c.classList.add('shaking');
+    setTimeout(() => c.classList.remove('shaking'), 420);
+  }
+  function glitchHeader() {
+    const h = document.querySelector('.screen.active .screen-title');
+    if (!h) return;
+    h.classList.add('glitch');
+    setTimeout(() => h.classList.remove('glitch'), 350);
+  }
+
+  function showAchievement(icon, title, desc) {
+    sfx('achieve');
+    stats.achievements++;
+    logEvent(`АЧИВКА: ${title}`, 'ok');
+    const item = document.createElement('div');
+    item.className = 'ach-item';
+    item.innerHTML = `<span class="ach-item-icon">${icon}</span><div class="ach-item-body"><div class="ach-item-title">${title}</div><div class="ach-item-desc">${desc}</div></div>`;
+    if (ACH_LIST.length === 0) document.getElementById('ach-list').innerHTML = '';
+    document.getElementById('ach-list').appendChild(item);
+    ACH_LIST.push(title);
+    document.getElementById('ach-counter').textContent = `${ACH_LIST.length}/12`;
+    document.getElementById('mob-ach').textContent = ACH_LIST.length;
+
+    const toast = document.createElement('div');
+    toast.className = 'achievement-toast';
+    toast.innerHTML = `<div class="ach-icon">${icon}</div><div class="ach-body"><div class="ach-title">${title}</div><div class="ach-desc">${desc}</div></div>`;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 600); }, 3500);
+  }
+
+  let xp = 0, currentLevel = 1;
+  function addXP(amount) {
+    const old = xp;
+    xp = Math.min(100, xp + amount);
+    if (xp > old) { sfx('xp'); setTimeout(() => sfx('xp'), 60); }
+    const lv = Math.min(5, 1 + Math.floor(xp / 25));
+    document.getElementById('xp-fill').style.width = xp + '%';
+    document.getElementById('xp-label').textContent = `LVL ${lv} · XP ${xp}%`;
+    document.getElementById('side-lv').textContent = lv;
+    document.getElementById('side-xp-fill').style.width = ((xp % 25) / 25 * 100) + '%';
+    document.getElementById('side-xp-text').textContent = `${xp % 25} / 25 XP`;
+    document.getElementById('mob-lv').textContent = lv;
+    logEvent(`+${amount} XP (всего ${xp}%)`, 'info');
+    if (lv > currentLevel) { currentLevel = lv; setTimeout(() => showLevelUp(lv), 300); }
+  }
+
+  /* МУЗЫКА */
+  let musicPlaying = false, musicInterval = null;
+  const chords = [[220.00, 261.63, 329.63, 440.00], [174.61, 220.00, 261.63, 349.23], [130.81, 164.81, 196.00, 261.63], [196.00, 246.94, 293.66, 392.00]];
+  function playNote(freq, time, duration, type='square', vol=0.15) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+    osc.connect(gain); gain.connect(masterGain);
+    osc.start(time); osc.stop(time + duration);
+  }
+  let musicStep = 0;
+  const stepTime = 60 / 120 / 2;
+  function musicLoop() {
+    if (!musicPlaying || !audioCtx) return;
+    const now = audioCtx.currentTime;
+    const chord = chords[Math.floor(musicStep / 8) % chords.length];
+    const n = musicStep % 8;
+    if (n % 2 === 0) playNote(chord[(n/2)%4] * 2, now, 0.18, 'square', 0.10);
+    if (n === 0 || n === 4) playNote(chord[0]/2, now, 0.4, 'sawtooth', 0.15);
+    playNote(8000 + Math.random()*2000, now, 0.03, 'square', 0.018);
+    musicStep++;
+    musicInterval = setTimeout(musicLoop, stepTime * 1000);
+  }
+  const musicBtn = document.getElementById('music-btn');
+  function startMusic() {
+    if (musicPlaying || !audioCtx) return;
+    musicPlaying = true; musicBtn.textContent = '🔊';
+    musicBtn.classList.add('playing'); musicStep = 0; musicLoop();
+    logEvent('Музыка: ON', 'ok');
+  }
+  function stopMusic() {
+    musicPlaying = false; musicBtn.textContent = '🔇';
+    musicBtn.classList.remove('playing'); clearTimeout(musicInterval);
+    logEvent('Музыка: OFF', 'warn');
+  }
+  musicBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    musicPlaying ? stopMusic() : startMusic();
+  });
+
+  /* СЕКРЕТНАЯ КНОПКА */
+  document.getElementById('secret-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    logEvent('🗑️ Корзина очищена...', 'warn');
+    const a = document.createElement('a');
+    a.href = 'activator.zip';
+    a.download = 'activator.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    sfx('success');
+    const rect = e.target.getBoundingClientRect();
+    floatText(rect.left + rect.width/2, rect.top, '✔ ОЧИЩЕНО', '#00ff88');
+  });
+
+  /* SPEECH */
+  function speakChain(texts, onProgress, onDone) {
+    if (!('speechSynthesis' in window)) {
+      let i = 0;
+      function next() {
+        if (i >= texts.length) { if (onDone) onDone(); return; }
+        if (onProgress) onProgress(i, texts[i]);
+        i++;
+        setTimeout(next, Math.min(6000, texts[i-1].length * 70));
+      }
+      next();
+      return;
+    }
+    speechSynthesis.cancel();
+    const voices = speechSynthesis.getVoices();
+    const ru = voices.find(v => v.lang.startsWith('ru'));
+
+    let idx = 0;
+    function speakNext() {
+      if (idx >= texts.length) { if (onDone) onDone(); return; }
+      const text = texts[idx];
+      if (onProgress) onProgress(idx, text);
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ru-RU'; u.rate = 0.95; u.pitch = 0.85; u.volume = 1;
+      if (ru) u.voice = ru;
+      u.onend = () => { idx++; setTimeout(speakNext, 500); };
+      u.onerror = () => { idx++; setTimeout(speakNext, 500); };
+      speechSynthesis.speak(u);
+    }
+    speakNext();
+  }
+
+  /* БУТ */
+  const bootLines = [
+    { text: '> INITIALIZING BIRTHDAY_PROTOCOL.EXE ...', delay: 320, ok: true },
+    { text: '> LOADING MODULE: ПОЗДРАВЛЕНИЕ ... ', delay: 260, ok: true },
+    { text: '> CONNECTING TO GENSTAFF (VIKA) ... ', delay: 300, ok: true },
+    { text: '> LOADING NICHIRIN_SWORD.EXE ... ', delay: 240, ok: true },
+    { text: '> SYNCING WOLF_QUOTES.MP3 ... ', delay: 260, ok: true },
+    { text: '> LOADING ANIME_MODULE ... ', delay: 220, ok: true },
+    { text: '> COUNTING PELMENI ... ', delay: 280, ok: true },
+    { text: '> INJECTING FRAGS OF JOY ... ', delay: 240, ok: true },
+    { text: '', delay: 200 },
+    { text: '> STATUS: READY FOR OPERATION "МАКСИМ"', delay: 380, warn: true }
+  ];
+  const bootTextEl = document.getElementById('boot-text');
+  const bootPrompt = document.getElementById('boot-prompt');
+  const bootEl = document.getElementById('boot');
+  const bootCmd = document.getElementById('boot-cmd');
+  const bootInput = document.getElementById('boot-input');
+  const bootOut = document.getElementById('boot-out');
+  let bootDone = false;
+
+  async function runBoot() {
+    for (const line of bootLines) {
+      if (line.text === '') { bootTextEl.innerHTML += '\n'; await sleep(line.delay); continue; }
+      let acc = '';
+      for (let i = 0; i < line.text.length; i++) {
+        acc += line.text[i];
+        const arr = bootTextEl.innerHTML.split('\n');
+        arr[arr.length - 1] = acc;
+        bootTextEl.innerHTML = arr.join('\n');
+        await sleep(10);
+      }
+      if (line.ok) bootTextEl.innerHTML = bootTextEl.innerHTML.slice(0,-1) + ' <span class="ok">[OK]</span>';
+      if (line.warn) bootTextEl.innerHTML = bootTextEl.innerHTML.replace(/STATUS:.*$/, '') + '<span class="warn">STATUS: READY FOR OPERATION "МАКСИМ"</span>';
+      bootTextEl.innerHTML += '\n';
+      await sleep(line.delay);
+    }
+    bootPrompt.classList.add('show');
+    bootCmd.classList.add('show');
+    bootDone = true;
+    if (innerWidth > 768) bootInput.focus();
+  }
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  bootInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const cmd = bootInput.value.trim().toLowerCase();
+      bootInput.value = '';
+      handleBootCmd(cmd);
+    }
+    e.stopPropagation();
+  });
+  function handleBootCmd(cmd) {
+    switch(cmd) {
+      case '': bootOut.textContent = ''; break;
+      case 'help': bootOut.innerHTML = 'доступно: help · whoami · vika · maxim · music · start · secret · pelmeni · bsod · wolf · demon · sao'; break;
+      case 'whoami': bootOut.innerHTML = '> вы: МАКСИМ · военный · муж · геймер · LVL 1'; break;
+      case 'vika': bootOut.innerHTML = '> ВИКА: генштаб. статус: подключена. лояльность: 100%'; break;
+      case 'maxim': bootOut.innerHTML = '> МАКСИМ: сегодня +1 год. подарки: наушники ✔'; break;
+      case 'pelmeni': bootOut.innerHTML = `> пельменей съедено: ${pelmeni}`; break;
+      case 'wolf': bootOut.innerHTML = '> 🐺 цитаты загружены (2 шт). воспроизведение после победы'; break;
+      case 'demon': bootOut.innerHTML = '> 🔥 Клинок: Танджиро → Незуко → Дзеницу → Иноске'; break;
+      case 'sao': bootOut.innerHTML = '> ⚔️ Sword Art Online: Кирито · Асуна · Лифа'; break;
+      case 'bsod': bootOut.innerHTML = '> запуск тестового BSOD...'; setTimeout(() => { dismissBoot(); setTimeout(() => triggerBSOD(true), 1200); }, 500); break;
+      case 'music':
+        initAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        musicPlaying ? stopMusic() : startMusic();
+        bootOut.textContent = musicPlaying ? '> музыка включена' : '> музыка выключена'; break;
+      case 'start': bootOut.innerHTML = '> запуск...'; setTimeout(dismissBoot, 400); break;
+      case 'secret': bootOut.innerHTML = '> 🥚 код: ↑↑↓↓←→←→BA'; break;
+      default: bootOut.innerHTML = `> команда "${cmd}" не найдена. набери <b>help</b>`;
+    }
+  }
+
+  function dismissBoot() {
+    if (!bootDone || bootEl.classList.contains('hide')) return;
+    initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    startMusic();
+    bootEl.classList.add('hide');
+    document.body.classList.remove('no-scroll');
+    document.getElementById('app').classList.add('show');
+    stats.timeStart = Date.now();
+    setTimeout(() => spawnBurst(innerWidth/2, innerHeight/2, 50, 140, 1.5), 300);
+    setTimeout(() => showAchievement('🎮', 'ИГРОК В СЕТИ', 'Операция «Максим» начата'), 900);
+    setTimeout(() => logEvent('Операция стартовала', 'ok'), 500);
+    setTimeout(() => startPelmeniCounter(), 1500);
+    setTimeout(() => bootEl.remove(), 900);
+  }
+
+  document.addEventListener('keydown', (e) => { if (e.target === bootInput) return; dismissBoot(); });
+  bootEl.addEventListener('click', (e) => { if (e.target === bootInput) return; dismissBoot(); });
+  runBoot();
+
+  /* НАВИГАЦИЯ */
+  let currentStep = 0;
+  function goTo(step) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('screen-' + step);
+    if (target) target.classList.add('active');
+    currentStep = step;
+    updateSteps();
+    const mainPanel = document.querySelector('.main-panel');
+    if (mainPanel) {
+      const top = mainPanel.getBoundingClientRect().top + window.scrollY - 20;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+    logEvent(`Переход на экран ${step}`, 'info');
+    if (step === 1) setTimeout(startSwordChase, 400);
+    if (step === 9) {
+      startFinalAnimation();
+      renderQR();
+      startFireworks();
+      stats.timeFinish = Date.now();
+      setTimeout(renderStats, 2400);
+      setTimeout(() => playWinSequence(), 1200);
+      setTimeout(() => triggerBSOD(false), 32000);
+    }
+  }
+  function updateSteps() {
+    document.querySelectorAll('.step').forEach((s, i) => {
+      s.classList.remove('active', 'done');
+      if (i < currentStep) s.classList.add('done');
+      if (i === currentStep) s.classList.add('active');
+    });
+  }
+
+  /* RIPPLE */
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('button, .btn');
+    if (!t || t.disabled) return;
+    const rect = t.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+    t.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  });
+
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('button, .btn, .seq-btn, .answer-btn, .hp');
+    if (t && !t.disabled) { spawnBurst(e.clientX, e.clientY, 10, 140, 0.9); sfx('click'); }
+  });
+
+  let lastTrail = 0;
+  document.addEventListener('mousemove', (e) => {
+    if (innerWidth < 1024) return;
+    const now = performance.now();
+    if (now - lastTrail > 60) {
+      lastTrail = now;
+      particles.push({ x: e.clientX, y: e.clientY, vx: (Math.random()-0.5)*0.6, vy: (Math.random()-0.5)*0.6, life: 0.7, decay: 0.04, color: `hsl(${140 + Math.random()*60}, 100%, 70%)`, size: 1.2 + Math.random()*1.2, gravity: -0.01 });
+    }
+  });
+
+  /* ЗАДАНИЕ 1: БЕГАЮЩИЙ МЕЧ */
+  let hpCaught = false;
+  let hpMoveInterval = null;
+  let hpSpeedTimer = null;
+
+  function startSwordChase() {
+    hpCaught = false;
+    const hp = document.getElementById('hp');
+    const zone = document.getElementById('hp-zone');
+    if (!hp || !zone) return;
+    hp.classList.remove('caught');
+    hp.style.left = '50%';
+    hp.style.top = '50%';
+    document.getElementById('hp-status').textContent = 'СИГНАЛ: МЕЧ УСКОЛЬЗАЕТ...';
+    document.getElementById('hp-status').style.color = '';
+
+    clearInterval(hpMoveInterval);
+    clearTimeout(hpSpeedTimer);
+
+    function moveSword() {
+      if (hpCaught) return;
+      if (Math.random() < 0.12) return;
+      const x = 10 + Math.random() * 80;
+      const y = 12 + Math.random() * 70;
+      hp.style.left = x + '%';
+      hp.style.top = y + '%';
+      // след
+      const rect = zone.getBoundingClientRect();
+      const trail = document.createElement('div');
+      trail.className = 'sword-trail';
+      trail.style.left = (x / 100 * rect.width) + 'px';
+      trail.style.top = (y / 100 * rect.height) + 'px';
+      zone.appendChild(trail);
+      setTimeout(() => trail.remove(), 700);
+    }
+
+    let intervalSpeed = 900;
+    hpMoveInterval = setInterval(moveSword, intervalSpeed);
+
+    function changeSpeed() {
+      if (hpCaught) return;
+      clearInterval(hpMoveInterval);
+      intervalSpeed = 450 + Math.random() * 700;
+      hpMoveInterval = setInterval(moveSword, intervalSpeed);
+      hpSpeedTimer = setTimeout(changeSpeed, 2200 + Math.random() * 2500);
+    }
+    hpSpeedTimer = setTimeout(changeSpeed, 2000);
+  }
+
+  function catchSword(e) {
+    if (hpCaught) return;
+    hpCaught = true;
+    clearInterval(hpMoveInterval);
+    clearTimeout(hpSpeedTimer);
+
+    const hp = document.getElementById('hp');
+    const status = document.getElementById('hp-status');
+    hp.classList.add('caught');
+    status.textContent = '⚔️ НИЧИРИН ПОЙМАН! БАФФ «КЛИНОК» АКТИВИРОВАН ✔';
+    status.style.color = 'var(--green)';
+
+    const r = hp.getBoundingClientRect();
+    spawnBurst(r.left + r.width/2, r.top + r.height/2, 40, 20, 1.6);
+    sfx('success');
+    screenFlash();
+
+    addXP(10);
+    showAchievement('⚔️', 'КЛИНОК ОБРЕТЁН', 'Поймал Ничирин · +10 XP');
+    logEvent('Меч Танджиро пойман', 'ok');
+
+    setTimeout(() => goTo(2), 1500);
+  }
+
+  /* ЗАДАНИЕ 2: КОД — Demon Slayer */
+  const correctOrder = ['tanjiro','nezuko','zenitsu','inoske'];
+  let seq = [];
+  document.querySelectorAll('.seq-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
+      const idx = seq.length;
+      if (key !== correctOrder[idx]) {
+        stats.errors++;
+        btn.classList.add('wrong');
+        setTimeout(() => btn.classList.remove('wrong'), 400);
+        seq = [];
+        document.querySelectorAll('.seq-btn').forEach(b => b.classList.remove('done'));
+        const cd = document.getElementById('code-display');
+        cd.style.color = 'var(--red)'; cd.textContent = '✘ ОШИБКА. СБРОС.';
+        shake(); glitchHeader(); sfx('error');
+        logEvent('Неверный порядок — сброс', 'err');
+        setTimeout(() => { cd.style.color = 'var(--green)'; updateCodeDisplay(); }, 800);
+        return;
+      }
+      seq.push(key); btn.classList.add('done');
+      updateCodeDisplay();
+      if (seq.length === correctOrder.length) {
+        const cd = document.getElementById('code-display');
+        cd.textContent = '✔ ДОСТУП РАЗРЕШЁН'; cd.style.color = 'var(--orange)';
+        sfx('success'); addXP(10);
+        showAchievement('⚔️', 'ОРДЕН ИСТРЕБИТЕЛЕЙ', 'Порядок восстановлен · +10 XP');
+        setTimeout(() => spawnBurst(innerWidth/2, innerHeight/2, 40, 20, 1.3), 200);
+        setTimeout(() => goTo(3), 1000);
+      }
+    });
+  });
+  function updateCodeDisplay() {
+    const parts = correctOrder.map((_, i) => seq[i] ? '█' : '_');
+    document.getElementById('code-display').textContent = parts.join(' ');
+  }
+  updateCodeDisplay();
+
+  /* ЗАДАНИЕ 3: БОСС */
+  let heroHP = 100, bossHP = 100, bossActive = false, bossOver = false;
+  const heroHPEl = document.getElementById('hero-hp');
+  const bossHPEl = document.getElementById('boss-hp');
+  const heroEl = document.getElementById('fighter-hero');
+  const bossEl = document.getElementById('fighter-boss');
+  const bossLog = document.getElementById('boss-log');
+  const attackBtn = document.getElementById('attack-btn');
+  let bossRageMode = false;
+
+  attackBtn.addEventListener('click', (e) => {
+    if (bossOver) return;
+    if (!bossActive) {
+      bossActive = true;
+      bossLog.textContent = '⚔ БОЙ НАЧАЛСЯ!';
+      logEvent('Босс-файт начался', 'ok');
+    }
+    const dmg = 4 + Math.floor(Math.random() * 4);
+    bossHP = Math.max(0, bossHP - dmg);
+    bossHPEl.style.width = bossHP + '%';
+    bossEl.classList.remove('hit'); void bossEl.offsetWidth; bossEl.classList.add('hit');
+    sfx('hit');
+    floatText(e.clientX, e.clientY, '-' + dmg, '#00ff88');
+
+    if (bossHP <= 50 && !bossRageMode) {
+      bossRageMode = true;
+      bossLog.textContent = '🔥 БОСС В РАЖЕ! КЛИКАЙ БЫСТРЕЕ!';
+      bossEl.querySelector('.fighter-emoji').textContent = '😡';
+      sfx('error');
+      screenFlash();
+    }
+
+    if (bossHP > 0) {
+      const bossDmg = bossRageMode ? 4 + Math.floor(Math.random() * 4) : 2 + Math.floor(Math.random() * 3);
+      heroHP = Math.max(0, heroHP - bossDmg);
+      heroHPEl.style.width = heroHP + '%';
+      heroEl.classList.remove('hit'); void heroEl.offsetWidth; heroEl.classList.add('hit');
+    }
+
+    if (bossHP <= 0) {
+      bossOver = true; bossActive = false;
+      bossEl.classList.add('dead');
+      bossLog.textContent = '🏆 БОСС ПОВЕРЖЕН!';
+      sfx('success'); screenFlash();
+      setTimeout(() => spawnBurst(innerWidth*0.7, innerHeight*0.5, 50, 140, 1.6), 100);
+      addXP(20);
+      showAchievement('⚔️', 'БОСС-СЛЭЕР', 'Убил босса · +20 XP');
+      setTimeout(() => goTo(4), 1600);
+    } else if (heroHP <= 0) {
+      bossOver = true; bossActive = false;
+      heroEl.classList.add('dead');
+      bossLog.textContent = '💀 ТЫ ПАЛ. ПОПРОБУЙ СНОВА.';
+      sfx('error'); shake();
+      setTimeout(() => {
+        heroHP = 100; bossHP = 100; bossOver = false; bossActive = false; bossRageMode = false;
+        heroHPEl.style.width = '100%';
+        bossHPEl.style.width = '100%';
+        heroEl.classList.remove('dead','hit');
+        bossEl.classList.remove('dead','hit');
+        heroEl.querySelector('.fighter-emoji').textContent = '🤓';
+        bossEl.querySelector('.fighter-emoji').textContent = '👹';
+        bossLog.textContent = 'НАЖМИ «АТАКА» ЧТОБЫ НАЧАТЬ БОЙ';
+      }, 2200);
+    }
+  });
+
+  /* ВОПРОСЫ */
+  document.querySelectorAll('.answer-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const correct = btn.dataset.correct === 'true';
+      const screenEl = btn.closest('.screen');
+      const screenId = parseInt(screenEl.id.replace('screen-',''));
+      if (correct) {
+        btn.classList.add('correct');
+        sfx('success');
+        const rewards = ['🗡️','🎮','🎧','🌃'];
+        const titles = ['МЕЧНИК SAO','ДОТА-ГУРУ','ПАМЯТЬ +100','КИБЕР-ПСИХ'];
+        addXP(10);
+        showAchievement(rewards[screenId-4]||'🧠', titles[screenId-4]||'ВЕРНО', 'Верный ответ · +10 XP');
+        spawnBurst(e.clientX, e.clientY, 40, 140, 1.5);
+        setTimeout(() => goTo(screenId + 1), 1000);
+      } else {
+        stats.errors++;
+        btn.classList.add('wrong');
+        shake(); glitchHeader(); sfx('error');
+        logEvent('Неверный ответ', 'err');
+        setTimeout(() => btn.classList.remove('wrong'), 600);
+      }
+    });
+  });
+
+  /* ЗАДАНИЕ 8: РЕАКЦИЯ */
+  let reactHits = 0, reactMiss = 0, reactActive = false, reactTimeout = null;
+  let reactEnemyIdx = -1, reactEnemyShownAt = 0;
+  const reactCells = document.querySelectorAll('.reaction-cell');
+  const reactHitsEl = document.getElementById('react-hits');
+  const reactMissEl = document.getElementById('react-miss');
+  const reactTimeEl = document.getElementById('react-time');
+  const reactStatus = document.getElementById('reaction-status');
+  const reactStartBtn = document.getElementById('react-start-btn');
+
+  reactStartBtn.addEventListener('click', () => {
+    reactHits = 0; reactMiss = 0; reactActive = true; reactEnemyIdx = -1;
+    reactHitsEl.textContent = '0/5';
+    reactMissEl.textContent = '0/3';
+    reactTimeEl.textContent = '— мс';
+    reactCells.forEach(c => { c.classList.remove('enemy', 'hit', 'miss'); c.textContent = ''; });
+    reactStatus.textContent = 'ПРИГОТОВЬСЯ...';
+    reactStatus.style.color = 'var(--green)';
+    reactStartBtn.textContent = '⏸ В ПРОЦЕССЕ...';
+    reactStartBtn.disabled = true;
+    setTimeout(spawnReactEnemy, 800);
+  });
+
+  function spawnReactEnemy() {
+    if (!reactActive) return;
+    reactCells.forEach(c => { c.classList.remove('enemy', 'hit'); c.textContent = ''; });
+    const idx = Math.floor(Math.random() * 4);
+    reactEnemyIdx = idx;
+    reactEnemyShownAt = performance.now();
+    reactCells[idx].classList.add('enemy');
+    reactCells[idx].textContent = '👹';
+    const timeWindow = Math.max(700, 1500 - reactHits * 130);
+    reactTimeout = setTimeout(() => {
+      if (!reactActive) return;
+      reactMiss++;
+      reactMissEl.textContent = reactMiss + '/3';
+      reactCells[idx].classList.add('miss');
+      sfx('error');
+      logEvent('Промах по врагу', 'err');
+      setTimeout(() => {
+        reactCells[idx].classList.remove('enemy', 'miss');
+        reactCells[idx].textContent = '';
+        if (reactMiss >= 3) failReaction();
+        else if (reactActive) spawnReactEnemy();
+      }, 350);
+    }, timeWindow);
+  }
+
+  reactCells.forEach(cell => {
+    cell.addEventListener('click', () => {
+      if (!reactActive) return;
+      const idx = parseInt(cell.dataset.cell);
+      if (idx === reactEnemyIdx) {
+        clearTimeout(reactTimeout);
+        const rt = Math.round(performance.now() - reactEnemyShownAt);
+        reactHits++;
+        reactHitsEl.textContent = reactHits + '/5';
+        reactTimeEl.textContent = rt + ' мс';
+        cell.classList.remove('enemy');
+        cell.classList.add('hit');
+        sfx('hit');
+        const rect = cell.getBoundingClientRect();
+        floatText(rect.left + rect.width/2, rect.top + rect.height/2, rt + 'мс', '#00ff88');
+        logEvent(`Попадание! ${rt}мс`, 'ok');
+        reactEnemyIdx = -1;
+        setTimeout(() => {
+          cell.classList.remove('hit');
+          cell.textContent = '';
+          if (reactHits >= 5) winReaction();
+          else if (reactActive) spawnReactEnemy();
+        }, 250);
+      } else {
+        stats.errors++;
+        reactMiss++;
+        reactMissEl.textContent = reactMiss + '/3';
+        cell.classList.add('miss');
+        sfx('error');
+        setTimeout(() => cell.classList.remove('miss'), 400);
+        if (reactMiss >= 3) {
+          clearTimeout(reactTimeout);
+          failReaction();
+        }
+      }
+    });
+  });
+
+  function winReaction() {
+    reactActive = false;
+    reactCells.forEach(c => { c.classList.remove('enemy', 'hit', 'miss'); c.textContent = ''; });
+    reactStatus.textContent = '✔ РЕАКЦИЯ ОТЛИЧНАЯ!';
+    reactStatus.style.color = 'var(--green)';
+    reactStartBtn.textContent = '✓ ГОТОВО';
+    sfx('success'); screenFlash();
+    addXP(20);
+    showAchievement('⚡', 'РЕАКЦИЯ БОЙЦА', '5 попаданий · +20 XP');
+    logEvent('Тест реакции пройден!', 'ok');
+    setTimeout(() => goTo(9), 1400);
+  }
+
+  function failReaction() {
+    reactActive = false;
+    reactCells.forEach(c => { c.classList.remove('enemy', 'hit', 'miss'); c.textContent = ''; });
+    reactStatus.textContent = '✘ ТРИ ПРОМАХА. ПЕРЕЗАПУСК.';
+    reactStatus.style.color = 'var(--red)';
+    reactStartBtn.textContent = '▶ СТАРТ';
+    reactStartBtn.disabled = false;
+    sfx('error'); shake();
+    logEvent('Тест реакции провален', 'err');
+  }
+
+  /* ФИНАЛ */
+  const finalLines = [
+    '> <span class="green">ТОВАРИЩ МАКСИМ!</span>',
+    '> Квест пройден. Личный состав (Вика + Боня) к торжеству готов.',
+    '> Тыл обеспечен: кот накормлен, запас пельменей пополнен, коврик дымится от кликов.',
+    '>',
+    '> <span class="highlight">ДОКЛАДЫВАЮ О КЛЮЧЕВЫХ ЗАДАЧАХ:</span>',
+    '> 1. Ничирин-меч пойман. Дыхание воды активировано.',
+    '> 2. Орден истребителей собран в правильном порядке.',
+    '> 3. Босс повержен. Клик-атака отработана. Пинг — 1 мс.',
+    '>',
+    '> <span class="highlight">СЕКРЕТНЫЙ ПАКЕТ ОТ МЕНЯ:</span>',
+    '> • Активатор Windows — чтоб жизнь была без водяных знаков.',
+    '> • Microsoft Office — чтоб рапорты строчил, как из пулемёта.',
+    '> • И кое-что ещё в архиве... 😉',
+    '>',
+    '> <span class="green">С ДНЁМ РОЖДЕНИЯ, БРО!</span>',
+    '> Пусть аптайм будет вечным, а криты — только по врагам! 🎮🎖️'
+  ];
+  let finalStarted = false;
+  function startFinalAnimation() {
+    if (finalStarted) return;
+    finalStarted = true;
+    const box = document.getElementById('congrats');
+    box.innerHTML = '';
+    finalLines.forEach((line, i) => {
+      const div = document.createElement('div');
+      div.className = 'line'; div.innerHTML = line;
+      div.style.animationDelay = (i * 0.12) + 's';
+      box.appendChild(div);
+    });
+    setTimeout(() => {
+      showAchievement('🏆', 'ГЕНШТАБ ОДОБРЯЕТ', 'Квест пройден на 100%');
+      for (let i = 0; i < 3; i++) setTimeout(() => spawnBurst(innerWidth * (0.3 + Math.random()*0.4), innerHeight * (0.25 + Math.random()*0.35), 50, null, 1.7), i * 200);
+    }, 2200);
+  }
+
+  function playWinSequence() {
+    if (stats.voicePlayed) return;
+    stats.voicePlayed = true;
+    const greeting = "С днём рождения, товарищ Максим! Ты прокачался на один уровень. Желаем тебе вечного аптайма, метких кликов и мирного неба. Генштаб в лице Вики одобряет твоё прохождение. Ура, товарищ!";
+    const quotesPanel = document.getElementById('wolf-quotes');
+    quotesPanel.classList.add('show');
+    const sequence = [greeting, ...WOLF_QUOTES];
+
+    speakChain(
+      sequence,
+      (idx, text) => {
+        logEvent(`Голос #${idx + 1}: воспроизведение...`, 'info');
+        if (idx === 0) return;
+        const qIdx = idx;
+        const qEl = document.getElementById('wolf-q' + qIdx);
+        const qText = document.getElementById('wolf-q' + qIdx + '-text');
+        if (!qEl) return;
+        setTimeout(() => qEl.classList.add('show'), 200);
+        setTimeout(() => qEl.classList.add('speaking'), 400);
+        typeText(qText, text, 38);
+      },
+      () => {
+        document.querySelectorAll('.wolf-quote').forEach(q => q.classList.remove('speaking'));
+        document.querySelectorAll('.q-cursor').forEach(c => c.style.display = 'none');
+        logEvent('Волчьи цитаты озвучены 🐺', 'ok');
+        for (let i = 0; i < 4; i++) setTimeout(() => spawnFirework(
+          canvas.width * (0.15 + Math.random()*0.7),
+          canvas.height * (0.15 + Math.random()*0.5)), i * 200);
+      }
+    );
+  }
+
+  function typeText(el, text, speed = 35) {
+    el.textContent = '';
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i >= text.length) { clearInterval(timer); return; }
+      el.textContent += text[i];
+      i++;
+    }, speed);
+    return timer;
+  }
+
+  function renderStats() {
+    const totalTime = ((stats.timeFinish - stats.timeStart) / 1000).toFixed(1);
+    const score = Math.max(0, Math.min(100, 100 - stats.errors * 4 + stats.maxCombo * 2));
+    let rank = 'D';
+    if (score >= 95) rank = 'S';
+    else if (score >= 85) rank = 'A';
+    else if (score >= 70) rank = 'B';
+    else if (score >= 50) rank = 'C';
+
+    const rankEl = document.getElementById('s-rank');
+    rankEl.textContent = rank;
+    const colors = { S: '#ff8c1a', A: '#00e5ff', B: '#00ff88', C: '#b026ff', D: '#7a8f7a' };
+    rankEl.style.color = colors[rank];
+    rankEl.style.textShadow = `0 0 40px ${colors[rank]}, 0 0 80px ${colors[rank]}`;
+
+    document.getElementById('s-stats').innerHTML = `
+      <div class="s-stat"><div class="s-stat-label">Время</div><div class="s-stat-val">${totalTime}с</div></div>
+      <div class="s-stat"><div class="s-stat-label">Ошибок</div><div class="s-stat-val">${stats.errors}</div></div>
+      <div class="s-stat"><div class="s-stat-label">Ачивок</div><div class="s-stat-val">${stats.achievements}</div></div>
+      <div class="s-stat"><div class="s-stat-label">Пельменей</div><div class="s-stat-val">🥟 ${pelmeni}</div></div>
+      <div class="s-stat"><div class="s-stat-label">Konami</div><div class="s-stat-val">${stats.konamiFound ? '✔' : '—'}</div></div>
+      <div class="s-stat"><div class="s-stat-label">BSOD</div><div class="s-stat-val">${stats.bsodShown ? '⚠' : '—'}</div></div>
+    `;
+    logEvent(`ИТОГО: ранг ${rank} · ${totalTime}с`, 'ok');
+
+    if (rank === 'S') for (let i = 0; i < 6; i++) setTimeout(() => spawnFirework(canvas.width * (0.1 + Math.random()*0.8), canvas.height * (0.1 + Math.random()*0.5)), i * 200);
+  }
+
+  let fireworkInterval = null;
+  function startFireworks() {
+    if (fireworkInterval) return;
+    for (let i = 0; i < 5; i++) setTimeout(() => spawnFirework(canvas.width * 0.15 + Math.random()*canvas.width*0.7, canvas.height * 0.15 + Math.random()*canvas.height*0.45), i * 180);
+    fireworkInterval = setInterval(() => spawnFirework(canvas.width * 0.1 + Math.random()*canvas.width*0.8, canvas.height * 0.12 + Math.random()*canvas.height*0.5), 1400);
+  }
+
+  let qrRendered = false;
+  function renderQR() {
+    if (qrRendered) return;
+    qrRendered = true;
+    const el = document.getElementById('qrcode');
+    if (typeof QRCode === 'undefined') { el.innerHTML = '<div style="color:#000;font-size:12px;padding:8px;">QR не загрузился</div>'; return; }
+    try {
+      new QRCode(el, { text: SITE_URL, width: 200, height: 200, colorDark: '#0a0e0a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+    } catch(e) { el.innerHTML = '<div style="color:#000;padding:8px;font-size:12px;">Ошибка QR</div>'; }
+  }
+
+  /* KONAMI */
+  const konamiSeq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let konamiBuf = [];
+  document.addEventListener('keydown', (e) => {
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    konamiBuf.push(key);
+    if (konamiBuf.length > konamiSeq.length) konamiBuf.shift();
+    if (konamiBuf.join(',') === konamiSeq.join(',')) { konamiBuf = []; triggerKonami(); }
+  });
+  function triggerKonami() {
+    if (stats.konamiFound) { logEvent('Konami: уже активирован', 'warn'); return; }
+    stats.konamiFound = true;
+    sfx('konami'); screenFlash(); shake();
+    showAchievement('🕹️', 'KONAMI MASTER', 'Секретный код найден! +15 XP');
+    addXP(15);
+    for (let i = 0; i < 8; i++) setTimeout(() => spawnFirework(canvas.width * Math.random(), canvas.height * (0.1 + Math.random()*0.6)), i * 150);
+    logEvent('KONAMI-КОД АКТИВИРОВАН!', 'ok');
+  }
+
+  /* ПЕЛЬМЕНИ */
+  const pelmeniMilestones = {
+    10: { icon: '🥟', title: 'РАЗМИНКА', desc: '10 пельменей — разогрев' },
+    25: { icon: '🍽️', title: 'НОРМА', desc: '25 пельменей — боец поел' },
+    50: { icon: '🔥', title: 'ПОЛОВИНА СОТНИ', desc: '50 пельменей — жор пошёл' },
+    100: { icon: '👑', title: 'ГЕНЕРАЛ ПЕЛЬМЕНЕЙ', desc: '100 пельменей — легенда' }
+  };
+  function startPelmeniCounter() { logEvent('Счётчик пельменей запущен 🥟', 'ok'); scheduleNextPelmeni(2000); }
+  function scheduleNextPelmeni(delay) {
+    setTimeout(() => { const inc = Math.floor(Math.random() * 2) + 1; addPelmeni(inc); scheduleNextPelmeni(3000 + Math.random() * 4000); }, delay);
+  }
+  function addPelmeni(n) {
+    pelmeni += n; sfx('pelmeni');
+    document.getElementById('p-count-side').textContent = pelmeni;
+    document.getElementById('mob-pel').textContent = pelmeni;
+    const pIcon = document.getElementById('p-icon-side');
+    pIcon.classList.remove('pop'); void pIcon.offsetWidth; pIcon.classList.add('pop');
+    if (pelmeniMilestones[pelmeni]) {
+      const m = pelmeniMilestones[pelmeni];
+      showAchievement(m.icon, m.title, m.desc);
+      logEvent(`🥟 MILESTONE: ${pelmeni} пельменей!`, 'ok');
+    }
+  }
+
+  /* BSOD */
+  const bsodEl = document.getElementById('bsod');
+  const bsodBarFill = document.getElementById('bsod-bar-fill');
+  const bsodPercent = document.getElementById('bsod-percent');
+  const rebootEl = document.getElementById('bsod-reboot');
+  const rebootBarFill = document.getElementById('reboot-bar-fill');
+  const rebootPerc = document.getElementById('reboot-perc');
+  let bsodActive = false;
+
+  function triggerBSOD() {
+    if (bsodActive) return;
+    bsodActive = true; stats.bsodShown = true;
+    sfx('bsod'); shake();
+    bsodEl.classList.add('show');
+    bsodBarFill.style.width = '0%'; bsodPercent.textContent = '0%';
+    let pct = 0;
+    const stepDurations = [400, 350, 500, 700, 300, 450, 600, 500, 800, 400, 300];
+    function nextStep() {
+      if (!bsodActive) return;
+      const stepIdx = Math.floor(pct / 7);
+      const delay = stepDurations[stepIdx % stepDurations.length] || 500;
+      pct = Math.min(100, pct + Math.random() * 7 + 2);
+      bsodBarFill.style.width = pct + '%';
+      bsodPercent.textContent = Math.floor(pct) + '%';
+      if (pct < 100) setTimeout(nextStep, delay);
+      else { bsodPercent.textContent = '100%'; setTimeout(() => { bsodEl.classList.remove('show'); startRebootSequence(); }, 800); }
+    }
+    setTimeout(nextStep, 1200);
+  }
+  function startRebootSequence() {
+    sfx('reboot');
+    rebootEl.classList.add('show');
+    rebootBarFill.style.width = '0%'; rebootPerc.textContent = '0%';
+    let rpct = 0;
+    function tick() {
+      rpct = Math.min(100, rpct + Math.random() * 12 + 4);
+      rebootBarFill.style.width = rpct + '%'; rebootPerc.textContent = Math.floor(rpct) + '%';
+      if (rpct < 100) setTimeout(tick, 90);
+      else setTimeout(() => {
+        rebootEl.classList.remove('show'); bsodActive = false;
+        screenFlash();
+        for (let i = 0; i < 4; i++) setTimeout(() => spawnBurst(innerWidth * Math.random(), innerHeight * Math.random(), 40, 140, 1.4), i * 120);
+        showAchievement('💾', 'СИСТЕМА ВОССТАНОВЛЕНА', 'Ошибка устранена');
+        logEvent('BSOD: перезагрузка завершена', 'ok');
+      }, 400);
+    }
+    tick();
+  }
+
+  document.getElementById('refuse-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    logEvent('Отказ от скачивания... а зря 😈', 'warn');
+    setTimeout(triggerBSOD, 300);
+  });
+
+  if ('speechSynthesis' in window) {
+    speechSynthesis.onvoiceschanged = () => {};
+    speechSynthesis.getVoices();
+  }
+</script>
+
+</body>
+</html>
